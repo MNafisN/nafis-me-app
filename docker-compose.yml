@@ -1,0 +1,21 @@
+# Template for the VPS. Copy this file ONCE to the folder you set as the
+# DEPLOY_PATH secret (e.g. ~/Apps/personal-website/docker-compose.yml).
+# The deploy workflow only runs "docker compose pull" and "up -d" there.
+#
+# The container joins the existing "reverse-proxy" network, so nginx-proxy can
+# reach it by name: proxy_pass http://personal-website:80;
+services:
+  personal-website:
+    image: ghcr.io/mnafisn/nafis-me-app:latest
+    container_name: personal-website
+    restart: unless-stopped
+    volumes:
+      # Files that must NOT live in git or in the image (e.g. the CV PDF).
+      # Put cv.pdf in /srv/personal-website on the VPS; it is served at /files/cv.pdf.
+      - /srv/personal-website:/usr/share/nginx/html/files:ro
+    networks:
+      - reverse-proxy
+
+networks:
+  reverse-proxy:
+    external: true
