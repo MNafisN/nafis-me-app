@@ -1,23 +1,12 @@
 ---
 import Button from "../components/Button.astro";
-import { Font } from "astro:assets";
+import Base from "../layouts/Base.astro";
+
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>NafisApp</title>
-		<Font cssVariable="--font-ibm-plex-mono" />
-		<Font cssVariable="--font-comfortaa" />
-	</head>
-	<body>
-		<h1>Hello Nafis App!</h1>
-		<Button href="/x">Link Test</Button>
-		<Button>Button Test</Button>
-		<Button variant="secondary">Secondary Btn Test</Button>
-	</body>
-</html>
+<Base title="NafisApp - Home">
+	<h1>Hello Nafis App!</h1>
+	<Button href="/x">Link Test</Button>
+	<Button>Button Test</Button>
+	<Button variant="secondary">Secondary Btn Test</Button>
+</Base>
