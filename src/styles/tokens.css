@@ -18,8 +18,9 @@
 
     --border-width: 2px;
     --radius: 0.5rem;        /* 8px */
-    --shadow-offset: 6px 6px;
-    --shadow-offset-sm: 3px 3px;
+    --shadow-offset: 6px;
+    --shadow-offset-sm: 3px;
+    --lift: 2px;             /* how far an element moves on hover */
 
     --space-1: 0.125rem;     /* 2px */
     --space-2: 0.25rem;      /* 4px */
