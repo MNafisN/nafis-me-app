@@ -1,6 +1,8 @@
 ---
+import { iban } from "astro:schema";
 import Button from "../components/Button.astro";
 import Tag from "../components/Tag.astro";
+import Card from "../components/Card.astro";
 import Base from "../layouts/Base.astro";
 
 // // Try to fetch external dummy data, curled from internet
@@ -14,4 +16,11 @@ import Base from "../layouts/Base.astro";
 	<Button variant="secondary">Secondary Btn Test</Button>
 	<Tag>NafisApp</Tag>
 	<Tag variant="secondary">Contact me</Tag>
+	<br/><br>
+	<Card tag="important" tagVariant="primary">
+		<h2>this is header2</h2>
+		<p>Card Test 1.</p>
+	</Card>
+	<Card tag="contact" tagVariant="secondary">Card Test 2</Card>
+	<Card>no tags</Card>
 </Base>

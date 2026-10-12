@@ -1,3 +1,40 @@
 ---
+import Tag from "./Tag.astro";
 
+const { tag, tagVariant = "primary" } = Astro.props;
 ---
+
+<article class="card">
+    <div class="card-body"><slot /></div>
+    {
+        tag && <div class="card-tag"><Tag variant={tagVariant}>{tag}</Tag></div>
+    }
+</article>
+
+<style>
+    .card {
+        position: relative;
+        background: var(--color-surface);
+
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+
+        padding: var(--space-5);
+        box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-ink);
+    }
+
+    .card-tag {
+        position: absolute;
+        top: 0;
+        right: var(--space-4);
+        transform: translateY(calc(-100% + var(--border-width)));
+    }
+
+    .card-body > :global(:first-child) {
+        margin-top: 0;
+    }
+
+    .card-body > :global(:last-child) {
+        margin-bottom: 0;
+    }
+</style>
