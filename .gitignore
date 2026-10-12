@@ -24,3 +24,5 @@ public/*.pdf
 
 # jetbrains setting folder
 .idea/
+
+artifacts/
