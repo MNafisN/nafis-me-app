@@ -1,0 +1,66 @@
+---
+// Tab Bar molecule component
+---
+
+<div class="tabbar">
+    <div class="tabs" role="tablist"><slot /></div>
+    <button type="button" class="tab-new" aria-label="New terminal tab">+</button>
+</div>
+
+<style>
+    .tabbar {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--space-2);
+
+        padding-inline: var(--space-3);
+        padding-top: var(--space-2);
+    }
+
+    .tabs {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--space-2);
+    }
+
+    .tab-new {
+        background: var(--color-bg);
+        color: var(--color-ink);
+        cursor: pointer;
+
+        font: inherit;
+        font-family: var(--font-body);
+        font-size: var(--text-lg);
+        font-weight: 700;
+        line-height: 1;
+
+        border: var(--border-width) solid var(--color-ink);
+        border-bottom: 0;
+        border-radius: var(--radius-tab);
+
+        min-height: 2.75rem;
+        min-width: 2.75rem;
+        transition: background-color var(--speed);
+    }
+
+    .tab-new:hover:not(:disabled) {
+        background: var(--color-accent);
+    }
+
+    .tab-new:focus-visible {
+        outline: var(--border-width) solid var(--color-ink);
+        outline-offset: calc(var(--border-width) * -2);
+    }
+
+    .tab-new:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .tab-new {
+            transition: none;
+        }
+}
+
+</style>

@@ -1,0 +1,19 @@
+---
+// Shell page frame
+---
+
+<main class="shell"><slot /></main>
+
+<style>
+    .shell {
+        display: grid;
+        min-height: 100dvh;
+        place-items: center;
+    }
+
+    @media (min-width: 48rem) {
+        .shell {
+            padding: var(--space-6);
+        }
+    }
+</style>

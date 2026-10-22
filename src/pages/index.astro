@@ -1,7 +1,9 @@
 ---
-import Button from "../components/Button.astro";
-import Tag from "../components/Tag.astro";
-import Card from "../components/Card.astro";
+import Tab from "../components/Tab.astro";
+import TabBar from "../components/TabBar.astro";
+import AppShell from "../components/AppShell.astro";
+import Terminal from "../components/Terminal.astro";
+import TerminalPanel from "../components/TerminalPanel.astro";
 import Base from "../layouts/Base.astro";
 
 // // Try to fetch external dummy data, curled from internet
@@ -9,17 +11,85 @@ import Base from "../layouts/Base.astro";
 ---
 
 <Base title="NafisApp - Home">
-	<h1>Hello Nafis App!</h1>
-	<Button href="/x">Link Test</Button>
-	<Button>Button Test</Button>
-	<Button variant="secondary">Secondary Btn Test</Button>
-	<Tag>NafisApp</Tag>
-	<Tag variant="secondary">Contact me</Tag>
-	<br/><br>
-	<Card tag="important" tagVariant="primary">
-		<h2>this is header2</h2>
-		<p>Card Test 1.</p>
-	</Card>
-	<Card tag="contact" tagVariant="secondary">Card Test 2</Card>
-	<Card>no tags</Card>
+	<AppShell>
+		<h1 class="sr-only">Welcome</h1>
+		<Terminal>
+			<TabBar slot="tabs">
+				<Tab active>Terminal</Tab>
+				<Tab>Projects</Tab>
+				<Tab>CV</Tab>
+				<Tab>Contact</Tab>
+			</TabBar>
+			<TerminalPanel id="panel-1" labelledby="tab-1">
+				<p>testing line one</p>
+				<p>testing line two</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p>testing line three</p>
+				<p class="credit">© 2026 NafisApp</p>
+			</TerminalPanel>
+			<div slot="actions">
+				quick actions
+			</div>
+			<div slot="input">
+				input bar
+			</div>
+		</Terminal>
+	</AppShell>
 </Base>
+
+<style>
+	.credit {
+		color: var(--term-muted);
+		font-size: var(--text-sm);
+	}
+</style>

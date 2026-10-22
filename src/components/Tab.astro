@@ -1,0 +1,51 @@
+---
+const { active = false } = Astro.props;
+---
+
+<button type="button" role="tab" aria-selected={active ? "true" : "false"} class:list={["tab", { active }]}>
+    <slot />
+</button>
+
+<style>
+    .tab {
+        background: var(--color-bg);
+        color: var(--color-ink);
+        cursor: pointer;
+        
+        font: inherit;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 700;
+
+        line-height: 1.2;
+
+        border: var(--border-width) solid var(--color-ink);
+        border-bottom: 0;
+        border-radius: var(--radius-tab);
+
+        padding: var(--space-2) var(--space-4);
+        min-height: 2.75rem;
+        transition: background-color var(--speed);
+    }
+
+    .tab.active {
+        background: var(--color-surface);
+        position: relative;
+        margin-bottom: calc(var(--border-width) * -1);
+    }
+
+    .tab:hover {
+        background: var(--color-accent);
+    }
+
+    .tab:focus-visible {
+        outline: var(--border-width) solid var(--color-ink);
+        outline-offset: calc(var(--border-width) * -2);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .tab {
+            transition: none;
+        }
+    }
+</style>

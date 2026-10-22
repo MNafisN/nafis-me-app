@@ -10,26 +10,33 @@
     --font-display: var(--font-comfortaa), sans-serif;
 
     --text-base: var(--text-md);
-    --text-sm: 0.875rem;     /* 14px */
-    --text-md: 1rem;         /* 16px */
-    --text-lg: 1.25rem;      /* 20px */
-    --text-xl: 1.5rem;       /* 24px */
-    --text-2xl: 2.5rem;      /* 40px */
+    --text-sm: 0.875rem;
+    --text-md: 1rem;
+    --text-lg: 1.25rem;
+    --text-xl: 1.5rem;
+    --text-2xl: 2.5rem;
 
     --border-width: 2px;
-    --radius: 0.5rem;        /* 8px */
+    --radius: 0.5rem;
+    --radius-tab: var(--radius) var(--radius) 0 0;
     --shadow-offset: 6px;
     --shadow-offset-sm: 3px;
     --lift: 2px;             /* how far an element moves on hover */
 
-    --space-1: 0.125rem;     /* 2px */
-    --space-2: 0.25rem;      /* 4px */
-    --space-3: 0.5rem;       /* 8px */
-    --space-4: 1rem;         /* 16px */
-    --space-5: 1.5rem;       /* 24px */
-    --space-6: 2rem;         /* 32px */
-    --space-7: 3rem;         /* 48px */
+    --space-1: 0.125rem;
+    --space-2: 0.25rem;
+    --space-3: 0.5rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
 
     --speed: 120ms;
     --container: 47.5rem;    /* 760px */
+
+    --terminal-width: 60rem;
+    --term-user: var(--color-ink);              /* bold */
+    --term-dir: #2f5fc4;                      /* bold, readable blue */
+    --term-muted: var(--color-text-muted);
+    --term-cursor: var(--color-accent);         /* background of the cursor block */
 }

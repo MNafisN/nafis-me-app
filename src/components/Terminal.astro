@@ -1,0 +1,48 @@
+---
+// Terminal page frame (big card)
+---
+
+<section class="terminal">
+    <div class="terminal-tabs"><slot name="tabs" /></div>
+    <div class="terminal-output"><slot /></div>
+    <div class="terminal-actions"><slot name="actions" /></div>
+    <div class="terminal-input"><slot name="input" /></div>
+</section>
+
+<style>
+    .terminal {
+        background: var(--color-surface);
+
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: 0;
+
+        box-shadow: none;
+
+        display: grid;
+        grid-template-rows: auto 1fr auto auto;
+
+        width: min(100%, var(--terminal-width));
+        height: 100dvh;                             /* on mobile views */
+    }
+
+    .terminal-output {
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    .terminal-tabs {
+        border-bottom: var(--border-width) solid var(--color-ink);
+    }
+
+    .terminal-actions {
+        border-top: var(--border-width) solid var(--color-ink);
+    }
+
+    @media (min-width: 48rem) {
+        .terminal {
+            height: min(100dvh - 4rem, 46rem);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-ink);
+        }
+    }
+</style>
