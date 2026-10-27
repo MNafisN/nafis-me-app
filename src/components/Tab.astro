@@ -28,14 +28,14 @@ const { active = false } = Astro.props;
         transition: background-color var(--speed);
     }
 
+    .tab:hover {
+        background: var(--color-accent);
+    }
+
     .tab.active {
         background: var(--color-surface);
         position: relative;
         margin-bottom: calc(var(--border-width) * -1);
-    }
-
-    .tab:hover {
-        background: var(--color-accent);
     }
 
     .tab:focus-visible {

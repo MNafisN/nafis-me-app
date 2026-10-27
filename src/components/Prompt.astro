@@ -1,4 +1,24 @@
 ---
-
+const { user = "guest", dir = "~" } = Astro.props;
 ---
 
+<span class="prompt"><b class="user">{user}</b><span class="at">@</span><b class="dir">{dir}</b> <span class="sign">&gt;</span></span>
+
+<style>
+    .prompt {
+        user-select: none;
+        white-space: nowrap;
+    }
+
+    .user {
+        color: var(--term-user);
+    }
+
+    .dir {
+        color: var(--term-dir);
+    }
+
+    .at, .sign {
+        color: var(--term-muted);
+    }
+</style>
