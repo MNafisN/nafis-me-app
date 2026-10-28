@@ -155,12 +155,6 @@ import TerminalSession from "./TerminalSession.astro";
         if (event.target.matches(".tab-rename")) finishRename(event.target, true, false);
     });
 
-    tablist.addEventListener("wheel", (event) => {
-        if (tablist.scrollWidth <= tablist.clientWidth || event.deltaY === 0) return;
-        event.preventDefault();
-        tablist.scrollLeft += event.deltaY;
-    }, { passive: false });
-
     tablist.addEventListener("keydown", (event) => {
         if (event.target.matches(".tab-rename")) {
             if (event.key === "Enter") finishRename(event.target, true, true);

@@ -59,9 +59,13 @@ const { active = false, id, controls, closable = false } = Astro.props;
         box-shadow: none;
     }
 
-    .tab:focus-visible {
-        outline: var(--border-width) solid var(--color-ink);
-        outline-offset: calc(var(--border-width) * -2);
+    .tab:focus-visible,
+    .tab-rename:focus-visible {
+        outline: var(--border-width) solid transparent;
+        box-shadow:
+            inset var(--border-width) 0 0 var(--color-ink),
+            inset calc(var(--border-width) * -1) 0 0 var(--color-ink),
+            inset 0 var(--border-width) 0 var(--color-ink);
     }
 
     .tab-rename {
@@ -83,11 +87,6 @@ const { active = false, id, controls, closable = false } = Astro.props;
         min-height: 2.75rem;
         min-width: 8ch;
         field-sizing: content;
-    }
-
-    .tab-rename:focus-visible {
-        outline: var(--border-width) solid var(--color-ink);
-        outline-offset: calc(var(--border-width) * -2);
     }
 
     .tab-close {

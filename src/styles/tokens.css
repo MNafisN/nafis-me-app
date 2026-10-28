@@ -31,6 +31,10 @@
     --space-6: 2rem;
     --space-7: 3rem;
 
+    --scrollbar-thumb: color-mix(in srgb, var(--color-ink) 30%, transparent);
+    --scrollbar-thumb-hover: color-mix(in srgb, var(--color-ink) 55%, transparent);
+    --scrollbar-thumb-active: color-mix(in srgb, var(--color-ink) 70%, transparent);
+
     --speed: 120ms;
     --container: 47.5rem;    /* 760px */
 

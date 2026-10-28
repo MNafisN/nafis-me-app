@@ -3,7 +3,12 @@
 ---
 
 <div class="tabbar">
-    <div class="tabs" role="tablist"><slot /></div>
+    <div class="tabs-viewport">
+        <div class="tabs" role="tablist"><slot /></div>
+        <div class="tabs-scrollbar" aria-hidden="true">
+            <div class="tabs-thumb"></div>
+        </div>
+    </div>
     <button type="button" class="tab-new" aria-label="New terminal tab">+</button>
 </div>
 
@@ -18,22 +23,104 @@
         box-shadow: inset 0 calc(var(--border-width) * -1) 0 var(--color-ink);
     }
 
+    .tabs-viewport {
+        position: relative;
+        min-width: 0;
+    }
+
     .tabs {
+        --fade-size: 2rem;
+        --fade-start: 0px;
+        --fade-end: 0px;
+
         display: flex;
         align-items: flex-end;
         gap: var(--space-2);
 
-        /* The top padding lives inside the scroll container, so its clip edge sits above the tabs' top border */
-        padding-top: var(--space-2);
+        /* The top padding lives inside the scroll container, so its clip edge sits above the tabs' top border.
+           It also holds the custom scrollbar. */
+        padding-top: var(--space-3);
 
-        min-width: 0;
         overflow-x: auto;
         overflow-y: hidden;
         scrollbar-width: none;
+
+        /* Keep a selected tab clear of the edge fades when it scrolls into view */
+        scroll-padding-inline: var(--fade-size);
+
+        mask-image: linear-gradient(
+            to right,
+            transparent,
+            #000 var(--fade-start),
+            #000 calc(100% - var(--fade-end)),
+            transparent
+        );
     }
 
     .tabs::-webkit-scrollbar {
         display: none;
+    }
+
+    .tabs.fade-start {
+        --fade-start: var(--fade-size);
+    }
+
+    .tabs.fade-end {
+        --fade-end: var(--fade-size);
+    }
+
+    .tabs-scrollbar {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--space-3);
+        pointer-events: none;
+    }
+
+    .tabs-viewport.is-overflowing .tabs-scrollbar {
+        display: block;
+    }
+
+    .tabs-thumb {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+
+        cursor: grab;
+        pointer-events: auto;
+        touch-action: none;
+    }
+
+    /* The visible bar is thinner than the thumb, so the thumb is easier to grab */
+    .tabs-thumb::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        translate: 0 -50%;
+        height: 3px;
+
+        background: var(--scrollbar-thumb);
+        border-radius: var(--radius);
+        transition: height var(--speed), background-color var(--speed);
+    }
+
+    .tabbar:hover .tabs-thumb::before {
+        height: 5px;
+        background: var(--scrollbar-thumb-hover);
+    }
+
+    .tabs-viewport.is-dragging .tabs-thumb {
+        cursor: grabbing;
+    }
+
+    .tabs-viewport.is-dragging .tabs-thumb::before {
+        height: 5px;
+        background: var(--scrollbar-thumb-active);
     }
 
     .tab-new {
@@ -63,8 +150,8 @@
     }
 
     .tab-new:focus-visible {
-        outline: var(--border-width) solid var(--color-ink);
-        outline-offset: calc(var(--border-width) * -2);
+        outline: var(--border-width) solid transparent;
+        box-shadow: inset 0 0 0 var(--border-width) var(--color-ink);
     }
 
     .tab-new:disabled {
@@ -73,8 +160,79 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .tab-new {
+        .tab-new,
+        .tabs-thumb::before {
             transition: none;
         }
     }
 </style>
+
+<script>
+    for (const viewport of document.querySelectorAll(".tabs-viewport")) {
+        const tabs = viewport.querySelector(".tabs");
+        const track = viewport.querySelector(".tabs-scrollbar");
+        const thumb = viewport.querySelector(".tabs-thumb");
+
+        function update() {
+            const { scrollLeft, scrollWidth, clientWidth } = tabs;
+            const maxScroll = scrollWidth - clientWidth;
+            const overflowing = maxScroll > 1;
+
+            viewport.classList.toggle("is-overflowing", overflowing);
+            tabs.classList.toggle("fade-start", overflowing && scrollLeft > 1);
+            tabs.classList.toggle("fade-end", overflowing && scrollLeft < maxScroll - 1);
+            if (!overflowing) return;
+
+            const trackWidth = track.clientWidth;
+            const thumbWidth = Math.max(trackWidth * (clientWidth / scrollWidth), 24);
+            const x = (trackWidth - thumbWidth) * (scrollLeft / maxScroll);
+            thumb.style.width = `${thumbWidth}px`;
+            thumb.style.translate = `${x}px 0`;
+        }
+
+        tabs.addEventListener("scroll", update, { passive: true });
+        tabs.addEventListener("input", update);
+        new ResizeObserver(update).observe(tabs);
+        new MutationObserver(update).observe(tabs, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ["hidden"],
+        });
+        document.fonts.ready.then(update);
+
+        tabs.addEventListener("wheel", (event) => {
+            if (tabs.scrollWidth <= tabs.clientWidth || event.deltaY === 0) return;
+            event.preventDefault();
+            tabs.scrollLeft += event.deltaY;
+        }, { passive: false });
+
+        thumb.addEventListener("pointerdown", (event) => {
+            event.preventDefault();
+            thumb.setPointerCapture(event.pointerId);
+            viewport.classList.add("is-dragging");
+
+            const startX = event.clientX;
+            const startScroll = tabs.scrollLeft;
+            const ratio = (tabs.scrollWidth - tabs.clientWidth) / (track.clientWidth - thumb.offsetWidth);
+
+            function move(e) {
+                tabs.scrollLeft = startScroll + (e.clientX - startX) * ratio;
+            }
+
+            function end() {
+                viewport.classList.remove("is-dragging");
+                thumb.removeEventListener("pointermove", move);
+                thumb.removeEventListener("pointerup", end);
+                thumb.removeEventListener("pointercancel", end);
+            }
+
+            thumb.addEventListener("pointermove", move);
+            thumb.addEventListener("pointerup", end);
+            thumb.addEventListener("pointercancel", end);
+        });
+
+        update();
+    }
+</script>
