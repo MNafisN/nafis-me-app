@@ -1,4 +1,6 @@
 ---
+import MaximizeToggle from "./MaximizeToggle.astro";
+import ShortcutsHint from "./ShortcutsHint.astro";
 import Tab from "./Tab.astro";
 import TabBar from "./TabBar.astro";
 import Terminal from "./Terminal.astro";
@@ -25,8 +27,12 @@ import TerminalSession from "./TerminalSession.astro";
     <TerminalPanel id="panel-1" labelledby="tab-1">
         <TerminalSession />
     </TerminalPanel>
-    <div slot="actions">
-        quick actions
+    <div slot="actions" class="actions">
+        <span>quick actions</span>
+        <div class="status">
+            <ShortcutsHint />
+            <MaximizeToggle />
+        </div>
     </div>
     <div slot="input">
         input bar
@@ -42,6 +48,21 @@ import TerminalSession from "./TerminalSession.astro";
         <TerminalSession />
     </TerminalPanel>
 </template>
+
+<style>
+    .actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding-left: var(--space-3);
+    }
+
+    .status {
+        display: flex;
+        align-items: center;
+    }
+</style>
 
 <script>
     const tablist = document.querySelector('[role="tablist"]');

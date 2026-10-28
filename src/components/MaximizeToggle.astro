@@ -1,0 +1,82 @@
+---
+// Maximize toggle: lets the terminal fill the browser window on wide screens
+---
+
+<button type="button" class="maximize" aria-keyshortcuts="f">
+    <kbd>F</kbd> <span class="maximize-label">maximize</span>
+</button>
+
+<style>
+    .maximize {
+        background: transparent;
+        color: var(--term-muted);
+        cursor: pointer;
+
+        font: inherit;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+
+        border: 0;
+        border-radius: var(--radius);
+
+        padding: var(--space-2) var(--space-3);
+        min-height: 2rem;
+        transition: color var(--speed);
+    }
+
+    .maximize:hover {
+        color: var(--color-ink);
+    }
+
+    .maximize:focus-visible {
+        outline: var(--border-width) solid transparent;
+        color: var(--color-ink);
+        text-decoration: underline;
+        text-decoration-thickness: var(--border-width);
+        text-underline-offset: 0.25em;
+    }
+
+    /* Phone-sized screens already use the full window */
+    @media (width < 48rem) {
+        .maximize {
+            display: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .maximize {
+            transition: none;
+        }
+    }
+</style>
+
+<script>
+    const root = document.documentElement;
+    const button = document.querySelector(".maximize");
+    const label = button.querySelector(".maximize-label");
+
+    function render() {
+        label.textContent = root.hasAttribute("data-maximized") ? "restore" : "maximize";
+    }
+
+    function toggle() {
+        const maximized = root.toggleAttribute("data-maximized");
+        try {
+            localStorage.setItem("terminal-maximized", maximized ? "1" : "0");
+        } catch {}
+        render();
+    }
+
+    button.addEventListener("click", toggle);
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key.toLowerCase() !== "f" || event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.target.closest("input, textarea, select, [contenteditable]")) return;
+        if (!matchMedia("(width >= 48rem)").matches) return;
+
+        event.preventDefault();
+        toggle();
+    });
+
+    render();
+</script>

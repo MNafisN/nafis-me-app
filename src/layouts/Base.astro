@@ -15,6 +15,14 @@ const { title = "NafisApp" } = Astro.props;
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<!-- Restore the maximized terminal before the first paint, so the page doesn't jump -->
+		<script is:inline>
+			try {
+				if (localStorage.getItem("terminal-maximized") === "1") {
+					document.documentElement.setAttribute("data-maximized", "");
+				}
+			} catch {}
+		</script>
 		<Font cssVariable="--font-ibm-plex-mono" />
 		<Font cssVariable="--font-comfortaa" />
 	</head>

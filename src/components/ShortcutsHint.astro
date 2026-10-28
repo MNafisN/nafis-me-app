@@ -1,0 +1,157 @@
+---
+// Keyboard shortcuts hint: a "? shortcuts" button and the popover it opens
+---
+
+<button type="button" class="hint" popovertarget="shortcuts-popover" aria-keyshortcuts="?">
+    <kbd>?</kbd> shortcuts
+</button>
+
+<div id="shortcuts-popover" class="shortcuts" popover role="dialog" aria-labelledby="shortcuts-title">
+    <h2 id="shortcuts-title">Shortcuts</h2>
+
+    <p class="group">Tabs (when a tab is focused)</p>
+    <dl class="keys">
+        <dt><kbd>←</kbd> <kbd>→</kbd></dt>
+        <dd>Switch tab</dd>
+        <dt><kbd>Home</kbd> <kbd>End</kbd></dt>
+        <dd>First or last tab</dd>
+        <dt><kbd>F2</kbd> or double-click</dt>
+        <dd>Rename a new terminal</dd>
+        <dt><kbd>Del</kbd> or <kbd>×</kbd></dt>
+        <dd>Close a new terminal</dd>
+    </dl>
+
+    <p class="group">Tab row</p>
+    <dl class="keys">
+        <dt>Wheel or <kbd>Shift</kbd> + wheel</dt>
+        <dd>Scroll the tabs</dd>
+        <dt>Drag the bar above the tabs</dt>
+        <dd>Scroll the tabs</dd>
+    </dl>
+
+    <p class="group">General</p>
+    <dl class="keys">
+        <dt><kbd>Tab</kbd></dt>
+        <dd>Move between tabs, + and the panel</dd>
+        <dt><kbd>F</kbd></dt>
+        <dd>Maximize or restore the terminal</dd>
+        <dt><kbd>?</kbd></dt>
+        <dd>Show or hide this list</dd>
+    </dl>
+</div>
+
+<style>
+    .hint {
+        background: transparent;
+        color: var(--term-muted);
+        cursor: pointer;
+
+        font: inherit;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+
+        border: 0;
+        border-radius: var(--radius);
+
+        padding: var(--space-2) var(--space-3);
+        min-height: 2rem;
+        transition: color var(--speed);
+    }
+
+    .hint:hover {
+        color: var(--color-ink);
+    }
+
+    .hint:focus-visible {
+        outline: var(--border-width) solid transparent;
+        color: var(--color-ink);
+        text-decoration: underline;
+        text-decoration-thickness: var(--border-width);
+        text-underline-offset: 0.25em;
+    }
+
+    .shortcuts {
+        background: var(--color-surface);
+        color: var(--color-ink);
+
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        line-height: 1.4;
+
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-offset-sm) var(--shadow-offset-sm) 0 var(--color-ink);
+
+        padding: var(--space-4);
+        width: min(26rem, 100vw - 2rem);
+    }
+
+    .shortcuts::backdrop {
+        background: transparent;
+    }
+
+    /* Sit just above the button where the browser supports anchor positioning; otherwise the popover stays centered */
+    @supports (anchor-name: --a) {
+        .hint {
+            anchor-name: --shortcuts-hint;
+        }
+
+        .shortcuts {
+            position-anchor: --shortcuts-hint;
+            inset: auto;
+            right: anchor(right);
+            bottom: anchor(top);
+            margin: 0 0 var(--space-3);
+        }
+    }
+
+    h2 {
+        font-size: var(--text-md);
+        margin: 0 0 var(--space-3);
+    }
+
+    .group {
+        color: var(--term-muted);
+        margin: 0 0 var(--space-2);
+    }
+
+    .keys {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: var(--space-2) var(--space-4);
+        margin: 0 0 var(--space-4);
+    }
+
+    .keys:last-child {
+        margin-bottom: 0;
+    }
+
+    .keys dd {
+        margin: 0;
+    }
+
+    /* Phone-sized screens get the mobile layout, where keyboard shortcuts rarely apply */
+    @media (width < 48rem) {
+        .hint {
+            display: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hint {
+            transition: none;
+        }
+    }
+</style>
+
+<script>
+    const popover = document.getElementById("shortcuts-popover");
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "?" || event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.target.closest("input, textarea, select, [contenteditable]")) return;
+
+        event.preventDefault();
+        popover.togglePopover();
+    });
+</script>
