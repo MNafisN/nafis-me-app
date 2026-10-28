@@ -20,6 +20,7 @@
 
         display: grid;
         grid-template-rows: auto 1fr auto auto;
+        grid-template-columns: minmax(0, 1fr);       /* a wide tab bar can't stretch the card */
 
         width: min(100%, var(--terminal-width));
         height: 100dvh;                             /* on mobile views */
@@ -28,10 +29,6 @@
     .terminal-output {
         overflow: hidden;
         min-height: 0;
-    }
-
-    .terminal-tabs {
-        border-bottom: var(--border-width) solid var(--color-ink);
     }
 
     .terminal-actions {

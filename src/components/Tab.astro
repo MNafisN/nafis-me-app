@@ -1,17 +1,73 @@
 ---
-const { active = false } = Astro.props;
+const { active = false, id, controls, closable = false } = Astro.props;
 ---
 
-<button type="button" role="tab" aria-selected={active ? "true" : "false"} class:list={["tab", { active }]}>
-    <slot />
-</button>
+<div class:list={["tab-item", { closable }]}>
+    <button type="button" role="tab" id={id} aria-controls={controls} aria-selected={active ? "true" : "false"} class:list={["tab", { active }]} title={closable ? "Double-click or press F2 to rename" : undefined}>
+        <slot />
+    </button>
+    {closable && (
+        <>
+            <input type="text" class="tab-rename" maxlength="16" size="16" aria-label="Tab name" hidden />
+            <button type="button" class="tab-close" tabindex="-1" aria-label="Close tab">×</button>
+        </>
+    )}
+</div>
 
 <style>
+    .tab-item {
+        position: relative;
+        display: flex;
+        flex-shrink: 0;
+    }
+
     .tab {
         background: var(--color-bg);
         color: var(--color-ink);
         cursor: pointer;
-        
+
+        font: inherit;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 700;
+
+        line-height: 1.2;
+        white-space: nowrap;
+
+        border: var(--border-width) solid var(--color-ink);
+        border-bottom: 0;
+        border-radius: var(--radius-tab);
+
+        /* The tab bar's bottom line, drawn inside the tab so it survives the scrolling tab list */
+        box-shadow: inset 0 calc(var(--border-width) * -1) 0 var(--color-ink);
+
+        padding: var(--space-2) var(--space-4);
+        min-height: 2.75rem;
+        transition: background-color var(--speed);
+    }
+
+    .closable .tab {
+        padding-right: 2.25rem;
+    }
+
+    .tab-item:hover .tab:not(.active) {
+        background: var(--color-accent);
+    }
+
+    .tab.active {
+        background: var(--color-surface);
+        box-shadow: none;
+    }
+
+    .tab:focus-visible {
+        outline: var(--border-width) solid var(--color-ink);
+        outline-offset: calc(var(--border-width) * -2);
+    }
+
+    .tab-rename {
+        background: var(--color-surface);
+        color: var(--color-ink);
+
         font: inherit;
         font-family: var(--font-body);
         font-size: var(--text-sm);
@@ -23,24 +79,44 @@ const { active = false } = Astro.props;
         border-bottom: 0;
         border-radius: var(--radius-tab);
 
-        padding: var(--space-2) var(--space-4);
+        padding: var(--space-2) 2.25rem var(--space-2) var(--space-4);
         min-height: 2.75rem;
-        transition: background-color var(--speed);
+        min-width: 8ch;
+        field-sizing: content;
     }
 
-    .tab:hover {
-        background: var(--color-accent);
-    }
-
-    .tab.active {
-        background: var(--color-surface);
-        position: relative;
-        margin-bottom: calc(var(--border-width) * -1);
-    }
-
-    .tab:focus-visible {
+    .tab-rename:focus-visible {
         outline: var(--border-width) solid var(--color-ink);
         outline-offset: calc(var(--border-width) * -2);
+    }
+
+    .tab-close {
+        position: absolute;
+        top: 50%;
+        right: var(--space-3);
+        translate: 0 -50%;
+
+        display: grid;
+        place-items: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0;
+
+        background: transparent;
+        color: var(--color-ink);
+        cursor: pointer;
+
+        font: inherit;
+        font-size: var(--text-md);
+        line-height: 1;
+
+        border: 0;
+        border-radius: var(--radius);
+    }
+
+    .tab-close:hover {
+        background: var(--color-ink);
+        color: var(--color-surface);
     }
 
     @media (prefers-reduced-motion: reduce) {

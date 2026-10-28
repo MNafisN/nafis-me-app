@@ -2,7 +2,7 @@
 const { id, labelledby, hidden = false } = Astro.props;
 ---
 
-<section role="tabpanel" class="panel" id={id} aria-labelledby={labelledby} hidden={hidden}>
+<section role="tabpanel" class="panel" id={id} aria-labelledby={labelledby} hidden={hidden} tabindex="0">
     <slot />
 </section>
 
@@ -11,6 +11,11 @@ const { id, labelledby, hidden = false } = Astro.props;
         height: 100%;
         overflow-y: auto;
         padding: var(--space-4);
+    }
+
+    .panel:focus-visible {
+        outline: var(--border-width) solid var(--color-ink);
+        outline-offset: calc(var(--border-width) * -2);
     }
 
     .panel[hidden] {

@@ -8,11 +8,20 @@ import TerminalSession from "./TerminalSession.astro";
 
 <Terminal>
     <TabBar slot="tabs">
-        <Tab active>Terminal</Tab>
-        <Tab>Projects</Tab>
-        <Tab>CV</Tab>
-        <Tab>Contact</Tab>
+        <Tab id="tab-home" controls="panel-home">Home</Tab>
+        <Tab id="tab-projects" controls="panel-projects">Projects</Tab>
+        <Tab id="tab-cv" controls="panel-cv">CV</Tab>
+        <Tab active id="tab-1" controls="panel-1">Terminal</Tab>
     </TabBar>
+    <TerminalPanel id="panel-home" labelledby="tab-home" hidden>
+        <p>Coming soon.</p>
+    </TerminalPanel>
+    <TerminalPanel id="panel-projects" labelledby="tab-projects" hidden>
+        <p>Coming soon.</p>
+    </TerminalPanel>
+    <TerminalPanel id="panel-cv" labelledby="tab-cv" hidden>
+        <p>Coming soon.</p>
+    </TerminalPanel>
     <TerminalPanel id="panel-1" labelledby="tab-1">
         <TerminalSession />
     </TerminalPanel>
@@ -25,7 +34,7 @@ import TerminalSession from "./TerminalSession.astro";
 </Terminal>
 
 <template id="tab-template">
-    <Tab>Terminal</Tab>
+    <Tab closable>Terminal</Tab>
 </template>
 
 <template id="panel-template">
@@ -33,3 +42,160 @@ import TerminalSession from "./TerminalSession.astro";
         <TerminalSession />
     </TerminalPanel>
 </template>
+
+<script>
+    const tablist = document.querySelector('[role="tablist"]');
+    const newTabButton = document.querySelector(".tab-new");
+    const output = document.getElementById("panel-1").parentElement;
+    const tabTemplate = document.getElementById("tab-template");
+    const panelTemplate = document.getElementById("panel-template");
+
+    const MAX_TERMINALS = 6;
+
+    function activate(tab) {
+        for (const t of tablist.querySelectorAll('[role="tab"]')) {
+            const selected = t === tab;
+            t.setAttribute("aria-selected", String(selected));
+            t.classList.toggle("active", selected);
+            t.tabIndex = selected ? 0 : -1;
+            const panel = document.getElementById(t.getAttribute("aria-controls"));
+            if (panel) panel.hidden = !selected;
+        }
+        tab.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+
+    function setLabel(tab, name) {
+        tab.textContent = name;
+        tab.parentElement.querySelector(".tab-close").setAttribute("aria-label", `Close ${name}`);
+    }
+
+    function updateNewTabButton() {
+        const terminals = 1 + tablist.querySelectorAll(".tab-close").length;
+        newTabButton.disabled = terminals >= MAX_TERMINALS;
+    }
+
+    function createTerminalTab() {
+        let number = 2;
+        while (document.getElementById(`tab-${number}`)) number += 1;
+
+        const item = tabTemplate.content.firstElementChild.cloneNode(true);
+        const tab = item.querySelector('[role="tab"]');
+        const panel = panelTemplate.content.firstElementChild.cloneNode(true);
+
+        tab.id = `tab-${number}`;
+        panel.id = `panel-${number}`;
+        tab.setAttribute("aria-controls", panel.id);
+        panel.setAttribute("aria-labelledby", tab.id);
+        setLabel(tab, `Terminal ${number}`);
+
+        tablist.append(item);
+        output.append(panel);
+        activate(tab);
+        updateNewTabButton();
+    }
+
+    function closeTab(tab) {
+        if (!tab.parentElement.classList.contains("closable")) return;
+
+        const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+        const index = tabs.indexOf(tab);
+        const wasSelected = tab.getAttribute("aria-selected") === "true";
+
+        document.getElementById(tab.getAttribute("aria-controls")).remove();
+        tab.parentElement.remove();
+
+        const current = wasSelected
+            ? (tabs[index + 1] ?? tabs[index - 1])
+            : tablist.querySelector('[aria-selected="true"]');
+        activate(current);
+        current.focus();
+        updateNewTabButton();
+    }
+
+    function startRename(tab) {
+        const input = tab.parentElement.querySelector(".tab-rename");
+        if (!input) return;
+
+        input.value = tab.textContent.trim();
+        tab.hidden = true;
+        input.hidden = false;
+        input.focus();
+        input.select();
+    }
+
+    function finishRename(input, save, refocus) {
+        if (input.hidden) return;
+
+        const tab = input.parentElement.querySelector('[role="tab"]');
+        const name = input.value.trim();
+        if (save && name) setLabel(tab, name);
+
+        input.hidden = true;
+        tab.hidden = false;
+        if (refocus) tab.focus();
+    }
+
+    tablist.addEventListener("click", (event) => {
+        const close = event.target.closest(".tab-close");
+        if (close) {
+            closeTab(close.parentElement.querySelector('[role="tab"]'));
+            return;
+        }
+
+        const tab = event.target.closest('[role="tab"]');
+        if (tab) activate(tab);
+    });
+
+    tablist.addEventListener("dblclick", (event) => {
+        const tab = event.target.closest('[role="tab"]');
+        if (tab) startRename(tab);
+    });
+
+    tablist.addEventListener("focusout", (event) => {
+        if (event.target.matches(".tab-rename")) finishRename(event.target, true, false);
+    });
+
+    tablist.addEventListener("wheel", (event) => {
+        if (tablist.scrollWidth <= tablist.clientWidth || event.deltaY === 0) return;
+        event.preventDefault();
+        tablist.scrollLeft += event.deltaY;
+    }, { passive: false });
+
+    tablist.addEventListener("keydown", (event) => {
+        if (event.target.matches(".tab-rename")) {
+            if (event.key === "Enter") finishRename(event.target, true, true);
+            else if (event.key === "Escape") finishRename(event.target, false, true);
+            return;
+        }
+
+        const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+        const index = tabs.indexOf(document.activeElement);
+        if (index === -1) return;
+
+        if (event.key === "F2") {
+            event.preventDefault();
+            startRename(tabs[index]);
+            return;
+        }
+
+        if (event.key === "Delete") {
+            closeTab(tabs[index]);
+            return;
+        }
+
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        else if (event.key === "ArrowLeft") next = tabs[(index - 1 + tabs.length) % tabs.length];
+        else if (event.key === "Home") next = tabs[0];
+        else if (event.key === "End") next = tabs[tabs.length - 1];
+        else return;
+
+        event.preventDefault();
+        activate(next);
+        next.focus();
+    });
+
+    newTabButton.addEventListener("click", createTerminalTab);
+
+    activate(tablist.querySelector('[aria-selected="true"]'));
+</script>
