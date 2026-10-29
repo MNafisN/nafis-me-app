@@ -3,7 +3,7 @@ const { active = false, id, controls, closable = false } = Astro.props;
 ---
 
 <div class:list={["tab-item", { closable }]}>
-    <button type="button" role="tab" id={id} aria-controls={controls} aria-selected={active ? "true" : "false"} class:list={["tab", { active }]} title={closable ? "Double-click or press F2 to rename" : undefined}>
+    <button type="button" role="tab" id={id} aria-controls={controls} aria-selected={active ? "true" : "false"} class:list={["tab", { active }]} title={closable ? "Double-click, press F2 or long-press to rename" : undefined}>
         <slot />
     </button>
     {closable && (
@@ -34,6 +34,11 @@ const { active = false, id, controls, closable = false } = Astro.props;
         line-height: 1.2;
         white-space: nowrap;
 
+        /* A long press renames on touch screens, so it must not select text or open the copy menu */
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+
         border: var(--border-width) solid var(--color-ink);
         border-bottom: 0;
         border-radius: var(--radius-tab);
@@ -50,13 +55,26 @@ const { active = false, id, controls, closable = false } = Astro.props;
         padding-right: 2.25rem;
     }
 
-    .tab-item:hover .tab:not(.active) {
-        background: var(--color-accent);
+    /* Only devices with a real mouse get hover colors; touch screens would leave them stuck after a tap */
+    @media (hover: hover) {
+        .tab-item:hover .tab:not(.active) {
+            background: var(--color-accent);
+        }
     }
 
     .tab.active {
         background: var(--color-surface);
         box-shadow: none;
+    }
+
+    /* Held long enough: lifting the finger now opens rename. Inverted, so it can't be mistaken for hover. */
+    .tab.is-armed {
+        background: var(--color-ink);
+        color: var(--color-surface);
+    }
+
+    .tab.is-armed ~ .tab-close {
+        color: var(--color-surface);
     }
 
     .tab:focus-visible,
@@ -116,6 +134,13 @@ const { active = false, id, controls, closable = false } = Astro.props;
     .tab-close:hover {
         background: var(--color-ink);
         color: var(--color-surface);
+    }
+
+    /* iOS zooms into text boxes under 16px, so the rename box gets 16px on touch screens */
+    @media (pointer: coarse) {
+        .tab-rename {
+            font-size: var(--text-md);
+        }
     }
 
     @media (prefers-reduced-motion: reduce) {

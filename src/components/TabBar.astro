@@ -109,9 +109,11 @@
         transition: height var(--speed), background-color var(--speed);
     }
 
-    .tabbar:hover .tabs-thumb::before {
-        height: 5px;
-        background: var(--scrollbar-thumb-hover);
+    @media (hover: hover) {
+        .tabbar:hover .tabs-thumb::before {
+            height: 5px;
+            background: var(--scrollbar-thumb-hover);
+        }
     }
 
     .tabs-viewport.is-dragging .tabs-thumb {
@@ -145,8 +147,10 @@
         transition: background-color var(--speed);
     }
 
-    .tab-new:hover:not(:disabled) {
-        background: var(--color-accent);
+    @media (hover: hover) {
+        .tab-new:hover:not(:disabled) {
+            background: var(--color-accent);
+        }
     }
 
     .tab-new:focus-visible {

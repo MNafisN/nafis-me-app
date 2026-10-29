@@ -172,6 +172,50 @@ import TerminalSession from "./TerminalSession.astro";
         if (tab) startRename(tab);
     });
 
+    // Long press to rename on touch screens. Rename opens when the finger lifts,
+    // because iOS only shows the keyboard for a focus that happens inside a touch event.
+    const LONG_PRESS_MS = 500;
+    let press = null;
+
+    function cancelPress() {
+        if (!press) return;
+        clearTimeout(press.timer);
+        press.tab.classList.remove("is-armed");
+        press = null;
+    }
+
+    tablist.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse") return;
+        const tab = event.target.closest('[role="tab"]');
+        if (!tab || !tab.parentElement.classList.contains("closable")) return;
+
+        cancelPress();
+        press = { tab, x: event.clientX, y: event.clientY, armed: false };
+        press.timer = setTimeout(() => {
+            press.armed = true;
+            tab.classList.add("is-armed");
+            navigator.vibrate?.(15);
+        }, LONG_PRESS_MS);
+    });
+
+    tablist.addEventListener("pointermove", (event) => {
+        if (press && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 10) cancelPress();
+    });
+
+    tablist.addEventListener("pointerup", () => {
+        if (!press) return;
+        const { tab, armed } = press;
+        cancelPress();
+        if (armed) startRename(tab);
+    });
+
+    tablist.addEventListener("pointercancel", cancelPress);
+
+    // Android opens a menu on long press; block it only during a touch press, so desktop right-click still works
+    tablist.addEventListener("contextmenu", (event) => {
+        if (press) event.preventDefault();
+    });
+
     tablist.addEventListener("focusout", (event) => {
         if (event.target.matches(".tab-rename")) finishRename(event.target, true, false);
     });
