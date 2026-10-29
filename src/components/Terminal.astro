@@ -5,8 +5,8 @@
 <section class="terminal">
     <div class="terminal-tabs"><slot name="tabs" /></div>
     <div class="terminal-output"><slot /></div>
-    <div class="terminal-actions"><slot name="actions" /></div>
     <div class="terminal-input"><slot name="input" /></div>
+    <div class="terminal-actions"><slot name="actions" /></div>
 </section>
 
 <style>
@@ -31,7 +31,9 @@
         min-height: 0;
     }
 
-    .terminal-actions {
+    /* The input sits on top of the bottom bar, so the line separates it from the output */
+    .terminal-input {
+        position: relative;
         border-top: var(--border-width) solid var(--color-ink);
     }
 
