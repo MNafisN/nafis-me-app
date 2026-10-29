@@ -1,10 +1,10 @@
 ---
-import Prompt from "./Prompt.astro";
+// Terminal session: the starting state of every Terminal tab, plus its message log
 ---
 
 <p class="banner">Welcome to NafisApp Terminal. Pick a quick action below, or type a message.</p>
-<p><Prompt /></p>
 <p class="credit">© 2026 NafisApp</p>
+<div class="log" role="log" aria-live="polite" data-log></div>
 
 <style>
     .banner {

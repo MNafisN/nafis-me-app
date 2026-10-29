@@ -1,5 +1,8 @@
 ---
+import CommandMenu from "./CommandMenu.astro";
+import InputBar from "./InputBar.astro";
 import MaximizeToggle from "./MaximizeToggle.astro";
+import MessageTemplates from "./MessageTemplates.astro";
 import ShortcutsHint from "./ShortcutsHint.astro";
 import Tab from "./Tab.astro";
 import TabBar from "./TabBar.astro";
@@ -27,17 +30,26 @@ import TerminalSession from "./TerminalSession.astro";
     <TerminalPanel id="panel-1" labelledby="tab-1">
         <TerminalSession />
     </TerminalPanel>
+    <div slot="input">
+        <CommandMenu />
+        <InputBar />
+    </div>
     <div slot="actions" class="actions">
-        <span>quick actions</span>
+        <div class="quick-actions" aria-label="Quick actions">
+            <button type="button" class="quick" data-command="/help">/help</button>
+            <button type="button" class="quick" data-command="/projects">/projects</button>
+            <button type="button" class="quick" data-fill="/project ">/project …</button>
+            <button type="button" class="quick" data-command="/cv">/cv</button>
+            <button type="button" class="quick" data-command="/contact">/contact</button>
+        </div>
         <div class="status">
             <ShortcutsHint />
             <MaximizeToggle />
         </div>
     </div>
-    <div slot="input">
-        input bar
-    </div>
 </Terminal>
+
+<MessageTemplates />
 
 <template id="tab-template">
     <Tab closable>Terminal</Tab>
@@ -58,13 +70,68 @@ import TerminalSession from "./TerminalSession.astro";
         padding-left: var(--space-3);
     }
 
+    /* On phones the status buttons are hidden, so the chips get the whole row and scroll sideways */
+    .quick-actions {
+        display: flex;
+        gap: var(--space-2);
+        min-width: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-block: var(--space-2);
+    }
+
+    .quick-actions::-webkit-scrollbar {
+        display: none;
+    }
+
+    .quick {
+        flex-shrink: 0;
+        background: var(--color-bg);
+        color: var(--color-ink);
+        cursor: pointer;
+
+        font: inherit;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        line-height: 1.2;
+        white-space: nowrap;
+
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+
+        padding: var(--space-2) var(--space-3);
+        min-height: 2rem;
+        transition: background-color var(--speed);
+    }
+
+    @media (hover: hover) {
+        .quick:hover {
+            background: var(--color-accent);
+        }
+    }
+
+    .quick:focus-visible {
+        outline: var(--border-width) solid transparent;
+        box-shadow: inset 0 0 0 var(--border-width) var(--color-ink);
+    }
+
     .status {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .quick {
+            transition: none;
+        }
     }
 </style>
 
 <script>
+    import { askAgent, isCommand, runCommand } from "../scripts/commands.js";
+    import { renderBlocks, renderCommand, renderPending } from "../scripts/render.js";
+
     const tablist = document.querySelector('[role="tablist"]');
     const newTabButton = document.querySelector(".tab-new");
     const output = document.getElementById("panel-1").parentElement;
@@ -72,6 +139,15 @@ import TerminalSession from "./TerminalSession.astro";
     const panelTemplate = document.getElementById("panel-template");
 
     const MAX_TERMINALS = 6;
+    let lastTerminalTab = document.getElementById("tab-1");
+
+    function panelOf(tab) {
+        return document.getElementById(tab.getAttribute("aria-controls"));
+    }
+
+    function isTerminal(tab) {
+        return Boolean(panelOf(tab)?.querySelector("[data-log]"));
+    }
 
     function activate(tab) {
         for (const t of tablist.querySelectorAll('[role="tab"]')) {
@@ -79,9 +155,10 @@ import TerminalSession from "./TerminalSession.astro";
             t.setAttribute("aria-selected", String(selected));
             t.classList.toggle("active", selected);
             t.tabIndex = selected ? 0 : -1;
-            const panel = document.getElementById(t.getAttribute("aria-controls"));
+            const panel = panelOf(t);
             if (panel) panel.hidden = !selected;
         }
+        if (isTerminal(tab)) lastTerminalTab = tab;
         tab.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
 
@@ -113,6 +190,7 @@ import TerminalSession from "./TerminalSession.astro";
         output.append(panel);
         activate(tab);
         updateNewTabButton();
+        document.dispatchEvent(new CustomEvent("terminal:focus"));
     }
 
     function closeTab(tab) {
@@ -164,7 +242,10 @@ import TerminalSession from "./TerminalSession.astro";
         }
 
         const tab = event.target.closest('[role="tab"]');
-        if (tab) activate(tab);
+        if (!tab) return;
+        activate(tab);
+        // A pointer click on a Terminal tab is ready for typing; keyboard clicks (detail 0) keep focus on the tab
+        if (event.detail > 0 && isTerminal(tab)) document.dispatchEvent(new CustomEvent("terminal:focus"));
     });
 
     tablist.addEventListener("dblclick", (event) => {
@@ -255,6 +336,76 @@ import TerminalSession from "./TerminalSession.astro";
     });
 
     newTabButton.addEventListener("click", createTerminalTab);
+
+    // Messages: a /command runs in the browser, anything else goes to the agent.
+    // Sending from Home, Projects or CV switches to the last-used Terminal tab first.
+    let busy = false;
+
+    function setBusy(value) {
+        busy = value;
+        document.dispatchEvent(new CustomEvent("terminal:busy", { detail: { busy } }));
+    }
+
+    function scrollToBottom(panel) {
+        panel.scrollTop = panel.scrollHeight;
+    }
+
+    function maximize() {
+        if (!matchMedia("(width >= 48rem)").matches) return false;
+        document.querySelector(".maximize")?.click();
+        return true;
+    }
+
+    async function send(text) {
+        if (busy || !text.trim()) return;
+
+        let tab = tablist.querySelector('[aria-selected="true"]');
+        if (!isTerminal(tab)) {
+            tab = lastTerminalTab?.isConnected ? lastTerminalTab : document.getElementById("tab-1");
+            activate(tab);
+        }
+        const panel = panelOf(tab);
+        const log = panel.querySelector("[data-log]");
+
+        log.append(renderCommand(text));
+        scrollToBottom(panel);
+        setBusy(true);
+
+        let blocks;
+        try {
+            if (isCommand(text)) {
+                blocks = await runCommand(text, { clear: () => log.replaceChildren(), maximize });
+            } else {
+                const pending = renderPending();
+                log.append(pending);
+                scrollToBottom(panel);
+                try {
+                    blocks = await askAgent(text);
+                } finally {
+                    pending.remove();
+                }
+            }
+        } catch {
+            blocks = [{ type: "error", text: "Something went wrong. Please try again." }];
+        }
+
+        log.append(renderBlocks(blocks));
+        scrollToBottom(panel);
+        setBusy(false);
+    }
+
+    document.addEventListener("terminal:submit", (event) => send(event.detail.text));
+
+    document.querySelector(".quick-actions").addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button) return;
+
+        if (button.dataset.fill) {
+            document.dispatchEvent(new CustomEvent("terminal:fill", { detail: { text: button.dataset.fill } }));
+        } else {
+            send(button.dataset.command);
+        }
+    });
 
     activate(tablist.querySelector('[aria-selected="true"]'));
 </script>
