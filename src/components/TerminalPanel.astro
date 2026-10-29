@@ -7,7 +7,9 @@ const { id, labelledby, hidden = false } = Astro.props;
 </section>
 
 <style>
+    /* Positioned, so absolute children (the sr-only link labels) are clipped here instead of stretching the page */
     .panel {
+        position: relative;
         height: 100%;
         overflow-y: auto;
         padding: var(--space-4);

@@ -46,7 +46,7 @@
         <dt><kbd>Tab</kbd></dt>
         <dd>Move between tabs, the panel, the input and the buttons</dd>
         <dt><kbd>F</kbd> or /maximize</dt>
-        <dd>Maximize or restore (<kbd>F</kbd> when not typing)</dd>
+        <dd>Maximize or restore (<kbd>F</kbd> on a tab or button)</dd>
         <dt><kbd>?</kbd></dt>
         <dd>Show or hide this list (also in an empty input)</dd>
     </dl>
@@ -163,9 +163,11 @@
         if (event.key !== "?" || event.ctrlKey || event.metaKey || event.altKey) return;
         // Like Claude Code, ? in the empty message input opens the list instead of typing
         // Wide screens only: on phones the button is hidden, and "?" from the on-screen keyboard is just typing
-        const emptyInput = event.target.id === "terminal-input" && event.target.value === ""
+        // activeElement, not event.target: the input bar may have just taken focus for this key
+        const target = document.activeElement;
+        const emptyInput = target.id === "terminal-input" && target.value === ""
             && matchMedia("(width >= 48rem)").matches;
-        if (!emptyInput && event.target.closest("input, textarea, select, [contenteditable]")) return;
+        if (!emptyInput && target.closest("input, textarea, select, [contenteditable]")) return;
 
         event.preventDefault();
         popover.togglePopover();

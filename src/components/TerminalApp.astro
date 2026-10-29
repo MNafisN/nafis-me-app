@@ -106,9 +106,16 @@ import TerminalSession from "./TerminalSession.astro";
     }
 
     @media (hover: hover) {
-        .quick:hover {
+        .quick:not([aria-disabled="true"]):hover {
             background: var(--color-accent);
         }
+    }
+
+    /* While a reply is on its way; aria-disabled rather than disabled, so a pressed chip keeps keyboard focus */
+    .quick[aria-disabled="true"] {
+        color: var(--term-muted);
+        border-color: var(--term-muted);
+        cursor: progress;
     }
 
     .quick:focus-visible {
@@ -341,9 +348,15 @@ import TerminalSession from "./TerminalSession.astro";
     // Messages: a /command runs in the browser, anything else goes to the agent.
     // Sending from Home, Projects or CV switches to the last-used Terminal tab first.
     let busy = false;
+    // The fill chip (/project …) stays usable: filling the input is fine while a reply is pending
+    const commandChips = document.querySelectorAll(".quick[data-command]");
 
     function setBusy(value) {
         busy = value;
+        for (const chip of commandChips) {
+            if (busy) chip.setAttribute("aria-disabled", "true");
+            else chip.removeAttribute("aria-disabled");
+        }
         document.dispatchEvent(new CustomEvent("terminal:busy", { detail: { busy } }));
     }
 

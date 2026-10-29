@@ -166,6 +166,17 @@ import Prompt from "./Prompt.astro";
         }
     });
 
+    // Typing while the output or the page has focus (e.g. after clicking a reply) goes into the box, like a chat app.
+    // Capture phase, so the F and ? shortcuts see the box focused; tabs and buttons keep those shortcuts.
+    document.addEventListener("keydown", (event) => {
+        if (event.key.length !== 1 || event.key === " ") return;     // printable characters only; Space still scrolls the panel
+        if ((event.ctrlKey || event.metaKey || event.altKey) && !event.getModifierState("AltGraph")) return;
+        if (event.target.closest('input, textarea, select, button, [contenteditable], [role="tab"]')) return;
+
+        input.focus();
+        caretToEnd();
+    }, true);
+
     // Clicking anywhere on the line (e.g. the prompt) puts the caret in the box, like a shell
     form.addEventListener("click", (event) => {
         if (event.target !== input) input.focus();

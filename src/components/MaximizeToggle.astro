@@ -71,7 +71,8 @@
 
     document.addEventListener("keydown", (event) => {
         if (event.key.toLowerCase() !== "f" || event.ctrlKey || event.metaKey || event.altKey) return;
-        if (event.target.closest("input, textarea, select, [contenteditable]")) return;
+        // activeElement, not event.target: the input bar may have just taken focus for this key
+        if (document.activeElement.closest("input, textarea, select, [contenteditable]")) return;
         if (!matchMedia("(width >= 48rem)").matches) return;
 
         event.preventDefault();
