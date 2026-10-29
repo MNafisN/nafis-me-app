@@ -1,0 +1,198 @@
+---
+// Input bar: the shell line where messages and /commands are typed
+import Prompt from "./Prompt.astro";
+---
+
+<form class="input-bar" id="input-bar">
+    <Prompt />
+    <textarea
+        id="terminal-input"
+        class="input"
+        rows="1"
+        aria-label="Message or /command"
+        autocomplete="off"
+        spellcheck="false"
+        enterkeyhint="send"
+    ></textarea>
+</form>
+
+<style>
+    .input-bar {
+        display: flex;
+        align-items: flex-start;            /* a multi-line message keeps the prompt on its first line */
+
+        font-family: var(--font-body);
+        font-size: var(--text-md);
+        line-height: 1.6;
+        color: var(--color-ink);
+
+        padding: var(--space-3) var(--space-4);
+        cursor: text;
+        transition: background-color var(--speed);
+    }
+
+    /* Background only, so nothing is drawn over the row's top border */
+    .input-bar:focus-within {
+        background: var(--color-bg);
+    }
+
+    .input-bar :global(.prompt) {
+        flex: none;
+    }
+
+    .input {
+        flex: 1;
+        min-width: 0;
+
+        margin: 0 0 0 var(--space-2);
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+
+        background: transparent;
+        color: var(--color-ink);
+        caret-color: var(--color-ink);
+
+        font: inherit;                      /* 16px, so iOS does not zoom */
+        line-height: inherit;
+
+        resize: none;
+        field-sizing: content;
+        min-height: 1.6em;
+        min-height: 1lh;
+        max-height: calc(1.6em * 4);
+        max-height: 4lh;
+        overflow-y: auto;
+
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) transparent;
+    }
+
+    .input:focus,
+    .input:focus-visible {
+        outline: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .input-bar {
+            transition: none;
+        }
+    }
+</style>
+
+<script>
+    const form = document.getElementById("input-bar");
+    const input = document.getElementById("terminal-input");
+    const touch = matchMedia("(pointer: coarse)");
+
+    const MAX_HISTORY = 50;
+    const history = [];
+    let position = 0;       // history.length means "the draft"
+    let draft = "";
+    let busy = false;
+
+    const growsNatively = Boolean(window.CSS && CSS.supports("field-sizing", "content"));
+
+    function resize() {
+        if (growsNatively) return;
+        // The CSS max-height caps this; past it the textarea scrolls
+        input.style.height = "auto";
+        input.style.height = `${input.scrollHeight}px`;
+    }
+
+    function caretToEnd() {
+        const end = input.value.length;
+        input.setSelectionRange(end, end);
+        input.scrollTop = input.scrollHeight;
+    }
+
+    function setValue(text) {
+        input.value = text;
+        resize();
+        caretToEnd();
+    }
+
+    function remember(text) {
+        if (history[history.length - 1] !== text) history.push(text);
+        if (history.length > MAX_HISTORY) history.shift();
+        position = history.length;
+        draft = "";
+    }
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        if (busy) return;
+
+        const text = input.value.trim();
+        if (!text) return;
+
+        remember(text);
+        setValue("");
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        form.dispatchEvent(new CustomEvent("terminal:submit", { bubbles: true, detail: { text } }));
+    });
+
+    input.addEventListener("input", resize);
+
+    input.addEventListener("keydown", (event) => {
+        // keyCode 229: Safari sends the Enter that ends an IME composition with isComposing false
+        if (event.isComposing || event.keyCode === 229) return;
+
+        if (event.key === "Enter") {
+            if (event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            form.requestSubmit();
+            return;
+        }
+
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+        if (event.key === "ArrowUp") {
+            if (input.value.slice(0, input.selectionStart).includes("\n")) return;
+            if (position === 0) return;
+
+            event.preventDefault();
+            if (position === history.length) draft = input.value;
+            position -= 1;
+            setValue(history[position]);
+        } else if (event.key === "ArrowDown") {
+            if (input.value.slice(input.selectionEnd).includes("\n")) return;
+            if (position >= history.length) return;
+
+            event.preventDefault();
+            position += 1;
+            setValue(position === history.length ? draft : history[position]);
+        }
+    });
+
+    // Clicking anywhere on the line (e.g. the prompt) puts the caret in the box, like a shell
+    form.addEventListener("click", (event) => {
+        if (event.target !== input) input.focus();
+    });
+
+    document.addEventListener("terminal:fill", (event) => {
+        const text = event.detail && event.detail.text;
+        if (typeof text !== "string") return;
+
+        position = history.length;
+        draft = "";
+        input.value = text;
+        resize();
+        input.focus();
+        caretToEnd();
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    document.addEventListener("terminal:focus", () => {
+        if (!touch.matches) input.focus();
+    });
+
+    document.addEventListener("terminal:busy", (event) => {
+        busy = Boolean(event.detail && event.detail.busy);
+        if (busy) form.setAttribute("aria-busy", "true");
+        else form.removeAttribute("aria-busy");
+    });
+
+    resize();
+    if (!touch.matches) input.focus({ preventScroll: true });
+</script>
