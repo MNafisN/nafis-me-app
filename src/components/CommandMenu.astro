@@ -1,0 +1,249 @@
+---
+// Command Menu: slash-command autocomplete list above the input
+---
+
+<ul id="command-menu" class="command-menu" role="listbox" aria-label="Commands" hidden></ul>
+
+<template id="command-menu-item">
+    <li class="option" role="option" aria-selected="false">
+        <span class="name"><span class="label" data-slot="label"></span><span class="hint" data-slot="hint"></span></span>
+        <span class="description" data-slot="description"></span>
+    </li>
+</template>
+
+<style>
+    .command-menu {
+        position: absolute;
+        bottom: 100%;
+        left: var(--space-3);
+        right: var(--space-3);
+        z-index: 10;
+
+        /* Rows share the columns, so every description starts at the same place */
+        display: grid;
+        grid-template-columns: fit-content(60%) minmax(0, 1fr);
+        column-gap: var(--space-4);
+
+        background: var(--color-surface);
+        color: var(--color-ink);
+
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        line-height: 1.4;
+
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-offset-sm) var(--shadow-offset-sm) 0 var(--color-ink);
+
+        list-style: none;
+        margin: 0 0 var(--space-2);
+        padding: var(--space-2);
+
+        max-height: 14rem;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) transparent;
+    }
+
+    .command-menu[hidden] {
+        display: none;
+    }
+
+    .option {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: subgrid;
+        align-items: center;
+
+        min-height: 2.25rem;
+        padding: var(--space-2) var(--space-3);
+        border-radius: calc(var(--radius) - var(--space-2));
+        cursor: pointer;
+    }
+
+    .name,
+    .description {
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .label {
+        font-weight: 700;
+    }
+
+    .hint {
+        margin-left: 1ch;
+        color: var(--term-muted);
+    }
+
+    .hint:empty {
+        display: none;
+    }
+
+    .description {
+        color: var(--term-muted);
+    }
+
+    @media (hover: hover) {
+        .option:hover {
+            background: color-mix(in srgb, var(--color-accent) 35%, var(--color-surface));
+        }
+    }
+
+    .option[aria-selected="true"] {
+        background: var(--color-accent);
+        color: var(--color-ink);
+    }
+
+    /* Muted gray is too faint on the yellow highlight */
+    .option[aria-selected="true"] .hint,
+    .option[aria-selected="true"] .description {
+        color: var(--color-ink);
+    }
+</style>
+
+<script>
+    import { suggest } from "../scripts/commands.js";
+
+    function setup(menu, template, input, form) {
+        const BLUR_DELAY_MS = 150;
+
+        let items = [];
+        let active = 0;
+        let silent = false;
+        let blurTimer = null;
+
+        function rows() {
+            return menu.querySelectorAll('[role="option"]');
+        }
+
+        function sameItems(a, b) {
+            return a.length === b.length && a.every((item, i) => item.value === b[i].value);
+        }
+
+        function render(list) {
+            items = list;
+            const clones = list.map((item, index) => {
+                const row = template.content.firstElementChild.cloneNode(true);
+                row.id = `command-menu-option-${index}`;
+                row.dataset.index = String(index);
+                row.querySelector('[data-slot="label"]').textContent = item.label ?? item.value;
+                row.querySelector('[data-slot="hint"]').textContent = item.hint ?? "";
+                row.querySelector('[data-slot="description"]').textContent = item.description ?? "";
+                return row;
+            });
+            menu.replaceChildren(...clones);
+            menu.scrollTop = 0;
+            highlight(0, false);
+        }
+
+        function highlight(index, scroll) {
+            active = index;
+            rows().forEach((row, i) => row.setAttribute("aria-selected", String(i === index)));
+
+            const row = rows()[index];
+            if (!row) return;
+            input.setAttribute("aria-activedescendant", row.id);
+            if (scroll) row.scrollIntoView({ block: "nearest" });
+        }
+
+        function open() {
+            menu.hidden = false;
+            input.setAttribute("aria-controls", "command-menu");
+            input.setAttribute("aria-autocomplete", "list");
+        }
+
+        function close() {
+            clearTimeout(blurTimer);
+            menu.hidden = true;
+            menu.replaceChildren();
+            items = [];
+            input.removeAttribute("aria-activedescendant");
+            input.removeAttribute("aria-controls");
+            input.removeAttribute("aria-autocomplete");
+        }
+
+        function update() {
+            const list = suggest(input.value) || [];
+            if (list.length === 0) {
+                close();
+                return;
+            }
+            if (menu.hidden || !sameItems(list, items)) render(list);
+            open();
+        }
+
+        function setValue(value) {
+            input.value = value;
+            input.setSelectionRange(value.length, value.length);
+        }
+
+        function pick(index, submit) {
+            const item = items[index];
+            if (!item) return;
+
+            if (item.needsArg) {
+                setValue(item.value + " ");
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+                return;
+            }
+
+            setValue(item.value);
+            close();
+            // Let InputBar resize, without the menu reopening on the finished command
+            silent = true;
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            silent = false;
+            if (submit) form.requestSubmit();
+        }
+
+        input.addEventListener("input", () => {
+            if (!silent) update();
+        });
+
+        // Capture phase, so InputBar's Enter and history handlers never see the keys used here
+        form.addEventListener("keydown", (event) => {
+            if (menu.hidden || event.target !== input) return;
+            if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
+
+            const count = items.length;
+            if (event.key === "ArrowDown") highlight((active + 1) % count, true);
+            else if (event.key === "ArrowUp") highlight((active - 1 + count) % count, true);
+            else if (event.key === "Tab" && !event.shiftKey) pick(active, false);
+            else if (event.key === "Enter" && !event.shiftKey) pick(active, true);
+            else if (event.key === "Escape") close();
+            else return;
+
+            event.preventDefault();
+            event.stopPropagation();
+        }, true);
+
+        // Keep focus in the textarea when an item or the menu's scrollbar is pressed
+        menu.addEventListener("pointerdown", (event) => {
+            event.preventDefault();
+        });
+
+        menu.addEventListener("click", (event) => {
+            const row = event.target.closest('[role="option"]');
+            if (row) pick(Number(row.dataset.index), true);
+        });
+
+        input.addEventListener("focusout", () => {
+            clearTimeout(blurTimer);
+            blurTimer = setTimeout(() => {
+                const focused = document.activeElement;
+                if (focused !== input && !menu.contains(focused)) close();
+            }, BLUR_DELAY_MS);
+        });
+    }
+
+    const menu = document.getElementById("command-menu");
+    const template = document.getElementById("command-menu-item");
+    const input = document.getElementById("terminal-input");
+    const form = document.getElementById("input-bar");
+
+    if (menu && template && input && form) setup(menu, template, input, form);
+</script>
