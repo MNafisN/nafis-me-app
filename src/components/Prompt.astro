@@ -1,8 +1,14 @@
 ---
-const { user = "guest", dir = "~" } = Astro.props;
+// Prompt atom: the shell prompt "guest@~ >", with an optional command and blinking cursor
+const { user = "guest", dir = "~", cursor = false } = Astro.props;
+const hasCommand = Astro.slots.has("default");
 ---
 
-<span class="prompt"><b class="user">{user}</b><span class="at">@</span><b class="dir">{dir}</b> <span class="sign">&gt;</span></span>
+<span class="prompt"><b class="user">{user}</b><span class="at">@</span><b class="dir">{dir}</b> <span class="sign">&gt;</span></span>{
+    hasCommand && <span class="command"><slot /></span>
+}{
+    cursor && <span class="cursor" aria-hidden="true"></span>
+}
 
 <style>
     .prompt {
@@ -20,5 +26,39 @@ const { user = "guest", dir = "~" } = Astro.props;
 
     .at, .sign {
         color: var(--term-muted);
+    }
+
+    .command {
+        margin-left: var(--space-2);
+        color: var(--color-ink);
+        font-weight: 400;
+    }
+
+    .cursor {
+        display: inline-block;
+        width: 0.6ch;
+        height: 1.1em;
+        margin-left: var(--space-2);
+        vertical-align: text-bottom;
+
+        background: var(--term-cursor);
+        animation: prompt-blink 1s steps(1) infinite;
+    }
+
+    /* Right after typed text, the cursor sits where the next character would go */
+    .command + .cursor {
+        margin-left: 0;
+    }
+
+    @keyframes prompt-blink {
+        50% {
+            opacity: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .cursor {
+            animation: none;
+        }
     }
 </style>

@@ -1,0 +1,263 @@
+---
+// Message templates: the <template> elements that src/scripts/render.js clones for the terminal log
+import Prompt from "./Prompt.astro";
+---
+
+<template id="msg-command">
+    <div class="msg command"><Prompt><span class="pre" data-slot="text"></span></Prompt></div>
+</template>
+
+<template id="msg-text">
+    <div class="msg reply">
+        <span class="marker" aria-hidden="true">●</span>
+        <div class="body"><p class="text pre" data-slot="text"></p></div>
+    </div>
+</template>
+
+<template id="msg-error">
+    <div class="msg reply error">
+        <span class="marker" aria-hidden="true">✕</span>
+        <div class="body"><p class="text"><span class="sr-only">Error: </span><span class="pre" data-slot="text"></span></p></div>
+    </div>
+</template>
+
+<template id="msg-list">
+    <div class="msg reply">
+        <span class="marker" aria-hidden="true">●</span>
+        <div class="body">
+            <p class="list-title" data-slot="title"></p>
+            <dl class="list" data-slot="items"></dl>
+        </div>
+    </div>
+</template>
+
+<template id="msg-list-item">
+    <dt class="term" data-slot="term"></dt>
+    <dd class="desc" data-slot="desc"></dd>
+</template>
+
+<template id="msg-cards">
+    <div class="msg reply">
+        <span class="marker" aria-hidden="true">●</span>
+        <div class="body"><ul class="cards" role="list" data-slot="items"></ul></div>
+    </div>
+</template>
+
+<template id="msg-card">
+    <li class="card">
+        <div class="card-head">
+            <p class="card-title" data-slot="title"><a class="link" data-slot="link" target="_blank" rel="noopener noreferrer"><span data-slot="label"></span><span data-slot="new-tab"><span class="external" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></span></a></p>
+            <span class="card-tag" data-slot="tag"></span>
+        </div>
+        <p class="card-desc" data-slot="desc"></p>
+    </li>
+</template>
+
+<template id="msg-links">
+    <div class="msg reply">
+        <span class="marker" aria-hidden="true">●</span>
+        <div class="body"><ul class="links" role="list" data-slot="items"></ul></div>
+    </div>
+</template>
+
+<template id="msg-link">
+    <li class="link-item"><a class="link" data-slot="link" target="_blank" rel="noopener noreferrer"><span data-slot="label"></span><span data-slot="new-tab"><span class="external" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></span></a></li>
+</template>
+
+<template id="msg-pending">
+    <div class="msg reply pending">
+        <span class="marker" aria-hidden="true">✻</span>
+        <div class="body"><p class="text">Thinking<span class="dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></p></div>
+    </div>
+</template>
+
+<style>
+    .msg {
+        margin-top: var(--space-3);
+        overflow-wrap: anywhere;
+    }
+
+    /* A little more air before each new turn */
+    .command {
+        margin-top: var(--space-4);
+    }
+
+    .pre {
+        white-space: pre-wrap;
+    }
+
+    /* Marker in the first column, content indented after it */
+    .reply {
+        display: grid;
+        grid-template-columns: 2ch minmax(0, 1fr);
+    }
+
+    .marker {
+        color: var(--term-muted);
+        user-select: none;
+    }
+
+    .error .marker {
+        color: var(--color-ink);
+        font-weight: 700;
+    }
+
+    .body {
+        min-width: 0;
+    }
+
+    .text,
+    .list-title,
+    .card-title,
+    .card-desc {
+        margin: 0;
+    }
+
+    .list-title {
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+    }
+
+    /* Term / description grid; long values wrap instead of widening the panel on phones */
+    .list {
+        display: grid;
+        grid-template-columns: fit-content(50%) minmax(0, 1fr);
+        gap: var(--space-1) var(--space-4);
+        margin: 0;
+    }
+
+    .term {
+        font-weight: 700;
+    }
+
+    .desc {
+        margin: 0;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+        gap: var(--space-3);
+
+        list-style: none;
+        margin: var(--space-2) 0 0;
+        /* Room for the hard shadows, so they never cause a horizontal scrollbar */
+        padding: 0 var(--shadow-offset-sm) var(--shadow-offset-sm) 0;
+    }
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        min-width: 0;
+
+        background: var(--color-surface);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-offset-sm) var(--shadow-offset-sm) 0 var(--color-ink);
+
+        padding: var(--space-3);
+    }
+
+    .card-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-2) var(--space-3);
+    }
+
+    .card-title {
+        font-weight: 700;
+        min-width: 0;
+    }
+
+    .card-desc {
+        color: var(--term-muted);
+        font-size: var(--text-sm);
+    }
+
+    .card-tag {
+        flex-shrink: 0;
+
+        background: var(--color-accent);
+        color: var(--color-ink);
+
+        font-size: var(--text-sm);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        line-height: 1.4;
+
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+
+        padding: 0 var(--space-2);
+    }
+
+    .links {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .link {
+        color: var(--color-ink);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.2em;
+        border-radius: var(--space-1);
+        transition: background-color var(--speed);
+    }
+
+    .link:focus-visible {
+        outline: var(--border-width) solid var(--color-ink);
+        outline-offset: var(--space-1);
+    }
+
+    .external {
+        color: var(--term-muted);
+    }
+
+    @media (hover: hover) {
+        .link:hover {
+            background: var(--color-accent);
+        }
+    }
+
+    .pending {
+        color: var(--term-muted);
+    }
+
+    .dots span {
+        animation: pending-dot 1.2s infinite;
+    }
+
+    .dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes pending-dot {
+        0%, 20% {
+            opacity: 0;
+        }
+
+        50%, 100% {
+            opacity: 1;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .link {
+            transition: none;
+        }
+
+        .dots span {
+            animation: none;
+        }
+    }
+</style>
