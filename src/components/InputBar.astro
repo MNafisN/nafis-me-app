@@ -68,9 +68,10 @@ import Prompt from "./Prompt.astro";
         scrollbar-color: var(--scrollbar-thumb) transparent;
     }
 
+    /* Transparent, so it only shows in Windows high-contrast mode, where the background change is dropped */
     .input:focus,
     .input:focus-visible {
-        outline: none;
+        outline: var(--border-width) solid transparent;
     }
 
     @media (prefers-reduced-motion: reduce) {

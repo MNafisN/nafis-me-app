@@ -44,7 +44,7 @@
     <p class="group">General</p>
     <dl class="keys">
         <dt><kbd>Tab</kbd></dt>
-        <dd>Move between tabs, + and the panel</dd>
+        <dd>Move between tabs, the panel, the input and the buttons</dd>
         <dt><kbd>F</kbd> or /maximize</dt>
         <dd>Maximize or restore (<kbd>F</kbd> when not typing)</dd>
         <dt><kbd>?</kbd></dt>
@@ -162,7 +162,9 @@
     document.addEventListener("keydown", (event) => {
         if (event.key !== "?" || event.ctrlKey || event.metaKey || event.altKey) return;
         // Like Claude Code, ? in the empty message input opens the list instead of typing
-        const emptyInput = event.target.id === "terminal-input" && event.target.value === "";
+        // Wide screens only: on phones the button is hidden, and "?" from the on-screen keyboard is just typing
+        const emptyInput = event.target.id === "terminal-input" && event.target.value === ""
+            && matchMedia("(width >= 48rem)").matches;
         if (!emptyInput && event.target.closest("input, textarea, select, [contenteditable]")) return;
 
         event.preventDefault();

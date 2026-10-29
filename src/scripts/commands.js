@@ -127,8 +127,10 @@ export function suggest(value) {
     // No space yet: complete the command name
     if (!/\s/.test(text)) {
         const prefix = text.slice(1).toLowerCase();
+        // An exact name goes first, so "/project" offers /project before /projects
         return commands
             .filter((command) => command.name.startsWith(prefix))
+            .sort((a, b) => (b.name === prefix) - (a.name === prefix))
             .map((command) => ({
                 value: `/${command.name}`,
                 label: `/${command.name}`,

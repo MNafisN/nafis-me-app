@@ -3,6 +3,8 @@
 ---
 
 <ul id="command-menu" class="command-menu" role="listbox" aria-label="Commands" hidden></ul>
+<!-- A textarea can't be a combobox, so screen readers hear the highlighted option through this instead -->
+<p id="command-menu-status" class="sr-only" role="status"></p>
 
 <template id="command-menu-item">
     <li class="option" role="option" aria-selected="false">
@@ -15,8 +17,8 @@
     .command-menu {
         position: absolute;
         bottom: 100%;
-        left: var(--space-3);
-        right: var(--space-3);
+        left: var(--space-4);
+        right: var(--space-4);
         z-index: 10;
 
         /* Rows share the columns, so every description starts at the same place */
@@ -110,6 +112,7 @@
 
     function setup(menu, template, input, form) {
         const BLUR_DELAY_MS = 150;
+        const status = document.getElementById("command-menu-status");
 
         let items = [];
         let active = 0;
@@ -147,6 +150,10 @@
             const row = rows()[index];
             if (!row) return;
             input.setAttribute("aria-activedescendant", row.id);
+
+            const item = items[index];
+            const name = [item.label ?? item.value, item.hint].filter(Boolean).join(" ");
+            status.textContent = `${name}, ${item.description ?? ""}, ${index + 1} of ${items.length}`;
             if (scroll) row.scrollIntoView({ block: "nearest" });
         }
 
@@ -161,6 +168,7 @@
             menu.hidden = true;
             menu.replaceChildren();
             items = [];
+            status.textContent = "";
             input.removeAttribute("aria-activedescendant");
             input.removeAttribute("aria-controls");
             input.removeAttribute("aria-autocomplete");

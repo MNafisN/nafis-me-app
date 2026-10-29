@@ -1,4 +1,5 @@
 ---
+// Terminal app organism: tabs, panels, input and bottom bar, plus the script that runs them
 import CommandMenu from "./CommandMenu.astro";
 import InputBar from "./InputBar.astro";
 import MaximizeToggle from "./MaximizeToggle.astro";
@@ -35,7 +36,7 @@ import TerminalSession from "./TerminalSession.astro";
         <InputBar />
     </div>
     <div slot="actions" class="actions">
-        <div class="quick-actions" aria-label="Quick actions">
+        <div class="quick-actions" role="group" aria-label="Quick actions">
             <button type="button" class="quick" data-command="/help">/help</button>
             <button type="button" class="quick" data-command="/projects">/projects</button>
             <button type="button" class="quick" data-fill="/project ">/project …</button>
@@ -389,9 +390,12 @@ import TerminalSession from "./TerminalSession.astro";
             blocks = [{ type: "error", text: "Something went wrong. Please try again." }];
         }
 
-        log.append(renderBlocks(blocks));
-        scrollToBottom(panel);
-        setBusy(false);
+        try {
+            log.append(renderBlocks(blocks));
+        } finally {
+            scrollToBottom(panel);
+            setBusy(false);
+        }
     }
 
     document.addEventListener("terminal:submit", (event) => send(event.detail.text));
