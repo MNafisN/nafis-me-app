@@ -19,13 +19,13 @@ import TerminalSession from "./TerminalSession.astro";
         <Tab id="tab-cv" controls="panel-cv">CV</Tab>
         <Tab active id="tab-1" controls="panel-1">Terminal</Tab>
     </TabBar>
-    <TerminalPanel id="panel-home" labelledby="tab-home" hidden>
+    <TerminalPanel id="panel-home" labelledby="tab-home" hidden page>
         <p>Coming soon.</p>
     </TerminalPanel>
-    <TerminalPanel id="panel-projects" labelledby="tab-projects" hidden>
+    <TerminalPanel id="panel-projects" labelledby="tab-projects" hidden page>
         <p>Coming soon.</p>
     </TerminalPanel>
-    <TerminalPanel id="panel-cv" labelledby="tab-cv" hidden>
+    <TerminalPanel id="panel-cv" labelledby="tab-cv" hidden page>
         <p>Coming soon.</p>
     </TerminalPanel>
     <TerminalPanel id="panel-1" labelledby="tab-1">
@@ -123,10 +123,18 @@ import TerminalSession from "./TerminalSession.astro";
         box-shadow: inset 0 0 0 var(--border-width) var(--color-ink);
     }
 
+    /* margin-left: auto keeps it on the right when the chips are hidden (Home, Projects, CV) */
     .status {
         display: flex;
         align-items: center;
         flex-shrink: 0;
+        gap: var(--space-3);
+        margin-left: auto;
+        padding-left: var(--space-3);
+    }
+
+    :global(.terminal[data-view="page"]) .quick-actions {
+        display: none;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -141,6 +149,7 @@ import TerminalSession from "./TerminalSession.astro";
     import { renderBlocks, renderCommand, renderPending } from "../scripts/render.js";
 
     const tablist = document.querySelector('[role="tablist"]');
+    const terminal = tablist.closest(".terminal");
     const newTabButton = document.querySelector(".tab-new");
     const output = document.getElementById("panel-1").parentElement;
     const tabTemplate = document.getElementById("tab-template");
@@ -167,6 +176,8 @@ import TerminalSession from "./TerminalSession.astro";
             if (panel) panel.hidden = !selected;
         }
         if (isTerminal(tab)) lastTerminalTab = tab;
+        // "page" hides the input, the quick actions and the shortcuts button (see the CSS)
+        terminal.dataset.view = isTerminal(tab) ? "terminal" : "page";
         tab.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
 

@@ -1,9 +1,10 @@
 ---
-const { id, labelledby, hidden = false } = Astro.props;
+// page: a plain web page (Home, Projects, CV) instead of a terminal session
+const { id, labelledby, hidden = false, page = false } = Astro.props;
 ---
 
 <section role="tabpanel" class="panel" id={id} aria-labelledby={labelledby} hidden={hidden} tabindex="0">
-    <div class="panel-content"><slot /></div>
+    <div class:list={["panel-content", { page }]}><slot /></div>
 </section>
 
 <style>
@@ -18,6 +19,12 @@ const { id, labelledby, hidden = false } = Astro.props;
     /* A ceiling on line length; only matters when the terminal is maximized on a wide screen */
     .panel-content {
         max-width: 200ch;
+    }
+
+    /* Pages read like a normal website: a centered column, text still left-aligned inside it */
+    .panel-content.page {
+        max-width: var(--container);
+        margin-inline: auto;
     }
 
     .panel:focus-visible {

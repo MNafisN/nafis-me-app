@@ -172,6 +172,7 @@ import Prompt from "./Prompt.astro";
         if (event.key.length !== 1 || event.key === " ") return;     // printable characters only; Space still scrolls the panel
         if ((event.ctrlKey || event.metaKey || event.altKey) && !event.getModifierState("AltGraph")) return;
         if (event.target.closest('input, textarea, select, button, [contenteditable], [role="tab"]')) return;
+        if (input.offsetParent === null) return;                    // hidden on Home, Projects and CV
 
         input.focus();
         caretToEnd();
