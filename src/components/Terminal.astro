@@ -11,6 +11,7 @@
 
 <style>
     .terminal {
+        --corner: 0px;                              /* the card's inner bottom-right radius, which the bar buttons follow */
         background: var(--color-surface);
 
         border: var(--border-width) solid var(--color-ink);
@@ -48,6 +49,7 @@
         }
 
         .terminal {
+            --corner: calc(var(--radius) - var(--border-width));
             height: min(100dvh - 4rem, 46rem);
             border-radius: var(--radius);
             box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-ink);
@@ -56,6 +58,7 @@
 
     /* Maximized: fill the browser window, the same way the phone layout does */
     :global(html[data-maximized]) .terminal {
+        --corner: 0px;
         width: 100%;
         height: 100dvh;
         border-radius: 0;

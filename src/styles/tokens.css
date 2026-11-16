@@ -35,6 +35,9 @@
     --scrollbar-thumb-hover: color-mix(in srgb, var(--color-ink) 55%, transparent);
     --scrollbar-thumb-active: color-mix(in srgb, var(--color-ink) 70%, transparent);
 
+    --bar-h: 2.5rem;                          /* height of the bottom bar */
+    --slant: calc(var(--bar-h) * 0.364);      /* sideways lean of the bar buttons: 20 degrees */
+
     --speed: 120ms;
     --container: 47.5rem;    /* 760px */
 

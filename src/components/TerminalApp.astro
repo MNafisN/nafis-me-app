@@ -123,12 +123,13 @@ import TerminalSession from "./TerminalSession.astro";
         box-shadow: inset 0 0 0 var(--border-width) var(--color-ink);
     }
 
-    /* margin-left: auto keeps it on the right when the chips are hidden (Home, Projects, CV) */
+    /* margin-left: auto keeps it on the right when the chips are hidden (Home, Projects, CV).
+       The buttons stretch to the full row height and sit flush against the card's bottom and right edge */
     .status {
         display: flex;
-        align-items: center;
+        align-items: stretch;
+        align-self: stretch;
         flex-shrink: 0;
-        gap: var(--space-3);
         margin-left: auto;
         padding-left: var(--space-3);
     }

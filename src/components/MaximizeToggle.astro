@@ -2,55 +2,16 @@
 // Maximize toggle: lets the terminal fill the browser window on wide screens
 ---
 
-<button type="button" class="maximize" aria-keyshortcuts="f">
+<button type="button" class="maximize bar-button" aria-keyshortcuts="f">
     <kbd>F</kbd> <span class="maximize-label">maximize</span>
 </button>
 
 <style>
-    /* A utility button: same shape as the quick-action chips, but a muted outline that turns solid on hover */
-    .maximize {
-        background: transparent;
-        color: var(--term-muted);
-        cursor: pointer;
-
-        font: inherit;
-        font-family: var(--font-body);
-        font-size: var(--text-sm);
-        line-height: 1.2;
-        white-space: nowrap;
-
-        border: var(--border-width) solid var(--term-muted);
-        border-radius: var(--radius);
-
-        padding: var(--space-2) var(--space-3);
-        min-height: 2rem;
-        transition: color var(--speed), border-color var(--speed), background-color var(--speed);
-    }
-
-    .maximize kbd {
-        color: inherit;
-        border-color: currentColor;
-        background: transparent;
-    }
+    /* The slanted bar-button look comes from global.css */
 
     /* F only works from a tab or button, so on Terminal tabs (where the input has focus) the button shows no key */
     :global(.terminal:not([data-view="page"])) .maximize kbd {
         display: none;
-    }
-
-    @media (hover: hover) {
-        .maximize:hover {
-            color: var(--color-ink);
-            border-color: var(--color-ink);
-            background: var(--color-bg);
-        }
-    }
-
-    .maximize:focus-visible {
-        outline: var(--border-width) solid transparent;
-        color: var(--color-ink);
-        border-color: var(--color-ink);
-        box-shadow: inset 0 0 0 var(--border-width) var(--color-ink);
     }
 
     /* Phone-sized screens already use the full window */
