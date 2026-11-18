@@ -38,16 +38,16 @@
         border-top: var(--border-width) solid var(--color-ink);
     }
 
-    /* Home, Projects and CV are plain pages: no input row, and the bottom bar keeps only the maximize button */
+    /* Home, Projects and CV are plain pages: no input row, and the bottom bar has its own top border */
     .terminal[data-view="page"] .terminal-input {
         display: none;
     }
 
-    @media (min-width: 48rem) {
-        .terminal[data-view="page"] .terminal-actions {
-            border-top: var(--border-width) solid var(--color-ink);
-        }
+    .terminal[data-view="page"] .terminal-actions {
+        border-top: var(--border-width) solid var(--color-ink);
+    }
 
+    @media (min-width: 48rem) {
         .terminal {
             --corner: calc(var(--radius) - var(--border-width));
             height: min(100dvh - 4rem, 46rem);

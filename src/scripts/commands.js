@@ -1,17 +1,30 @@
-// Slash commands and the fake AI agent (no DOM code; returns reply blocks)
-import { contact, cv, projects } from "../data/profile.js";
+// Slash commands and the fake AI agent (no DOM manipulation; reads documentElement.lang for locale)
+import { getProfile } from "../data/profile.js";
 
-export const commands = [
-    { name: "help", args: "", description: "List the commands" },
-    { name: "projects", args: "", description: "List the projects" },
-    { name: "project", args: "<name>", description: "Show one project" },
-    { name: "cv", args: "", description: "Show the CV summary and PDF link" },
-    { name: "contact", args: "", description: "Show the contact links" },
-    { name: "clear", args: "", description: "Clear this tab" },
-    { name: "maximize", args: "", description: "Maximize or restore the terminal (wide screens)" },
+const BASE_COMMANDS = [
+    { name: "help", args: "" },
+    { name: "projects", args: "" },
+    { name: "project", args: "<name>" },
+    { name: "cv", args: "" },
+    { name: "contact", args: "" },
+    { name: "clear", args: "" },
+    { name: "maximize", args: "" },
 ];
 
-const HELP_HINT = "Type /help to see the commands.";
+function currentProfile() {
+    const lang = typeof document !== "undefined" ? document.documentElement.lang : "id";
+    return getProfile(lang);
+}
+
+function localizedCommands() {
+    const { ui } = currentProfile();
+    return BASE_COMMANDS.map((cmd) => ({
+        ...cmd,
+        description: ui.commandDescriptions[cmd.name] ?? "",
+    }));
+}
+
+export const commands = localizedCommands();
 
 function usage(command) {
     return command.args ? `/${command.name} ${command.args}` : `/${command.name}`;
@@ -23,36 +36,40 @@ function card(project) {
     return item;
 }
 
-function slugList() {
+function slugList(projects) {
     return projects.map((project) => project.slug).join(", ");
 }
 
 function help() {
+    const { ui } = currentProfile();
+    const list = localizedCommands();
     return [
         {
             type: "list",
-            title: "Commands",
-            items: commands.map((command) => ({ term: usage(command), desc: command.description })),
+            title: ui.commandsTitle,
+            items: list.map((command) => ({ term: usage(command), desc: command.description })),
         },
         {
             type: "text",
-            text: "Type anything else (without a leading /) to chat with the AI agent.\nPress ? to see the keyboard shortcuts.",
+            text: ui.helpFooter,
         },
     ];
 }
 
 function listProjects() {
+    const { projects, ui } = currentProfile();
     return [
-        { type: "text", text: "Projects. Type /project <name> to see one in detail." },
+        { type: "text", text: ui.projectsIntro },
         { type: "cards", items: projects.map(card) },
     ];
 }
 
 function showProject(slug) {
+    const { projects, ui } = currentProfile();
     if (!slug) {
         return [{
             type: "error",
-            text: `Missing project name. Usage: /project <name>. Names: ${slugList()}. Type /projects to see them all, or /help for the commands.`,
+            text: ui.missingProjectError(slugList(projects)),
         }];
     }
 
@@ -60,7 +77,7 @@ function showProject(slug) {
     if (!project) {
         return [{
             type: "error",
-            text: `Unknown project: ${slug}. Names: ${slugList()}. Type /projects to see them all, or /help for the commands.`,
+            text: ui.unknownProjectError(slug, slugList(projects)),
         }];
     }
 
@@ -70,9 +87,10 @@ function showProject(slug) {
 }
 
 function showCv() {
+    const { cv, ui } = currentProfile();
     return [
         { type: "list", title: cv.role, items: cv.summary.map((line) => ({ term: "-", desc: line })) },
-        { type: "links", items: [{ label: "Download CV (PDF)", href: cv.pdf }] },
+        { type: "links", items: [{ label: ui.downloadCv, href: cv.pdf }] },
     ];
 }
 
@@ -81,6 +99,7 @@ export function isCommand(text) {
 }
 
 export async function runCommand(text, ctx) {
+    const { contact, ui } = currentProfile();
     const words = String(text).trim().slice(1).split(/\s+/).filter(Boolean);
     const name = (words[0] ?? "").toLowerCase();
     const arg = (words[1] ?? "").toLowerCase();
@@ -101,22 +120,23 @@ export async function runCommand(text, ctx) {
             return [];
         case "maximize":
             if (ctx?.maximize?.() === false) {
-                return [{ type: "text", text: "Maximize is only available on wider screens." }];
+                return [{ type: "text", text: ui.maximizeWideOnly }];
             }
             return [];
         case "":
-            return [{ type: "error", text: `Type a command name after /. ${HELP_HINT}` }];
+            return [{ type: "error", text: ui.emptyCommandError }];
         default:
-            return [{ type: "error", text: `Unknown command: /${words[0]}. ${HELP_HINT}` }];
+            return [{ type: "error", text: ui.unknownCommandError(words[0]) }];
     }
 }
 
-export async function askAgent(text) {
+export async function askAgent() {
+    const { ui } = currentProfile();
     const delay = 600 + Math.random() * 300;
     await new Promise((resolve) => setTimeout(resolve, delay));
     return [{
         type: "text",
-        text: "The AI agent is not connected yet (demo mode), so I can't answer that for now.\nTry /help to see what you can do here.",
+        text: ui.agentDemoReply,
     }];
 }
 
@@ -124,11 +144,14 @@ export function suggest(value) {
     const text = String(value).trimStart();
     if (!text.startsWith("/")) return [];
 
+    const { projects } = currentProfile();
+    const list = localizedCommands();
+
     // No space yet: complete the command name
     if (!/\s/.test(text)) {
         const prefix = text.slice(1).toLowerCase();
         // An exact name goes first, so "/project" offers /project before /projects
-        return commands
+        return list
             .filter((command) => command.name.startsWith(prefix))
             .sort((a, b) => (b.name === prefix) - (a.name === prefix))
             .map((command) => ({

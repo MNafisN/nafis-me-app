@@ -154,6 +154,26 @@ kbd {
     border-bottom-right-radius: var(--corner);
 }
 
+/* On phones, .hint and .maximize are hidden, so the language toggle (:first-of-type) is the rightmost button */
+@media (width < 48rem) {
+    .bar-button:first-of-type {
+        padding-right: var(--space-3);
+    }
+
+    .bar-button:first-of-type::before {
+        clip-path: polygon(var(--slant) 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    .bar-button:first-of-type::after {
+        clip-path: polygon(
+            calc(var(--slant) - 0.364 * var(--top-b) + 1.064 * var(--b)) 0,
+            100% 0,
+            100% 100%,
+            calc(1.064 * var(--b)) 100%
+        );
+    }
+}
+
 .bar-button kbd {
     color: inherit;
     border-color: currentColor;

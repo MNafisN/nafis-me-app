@@ -1,7 +1,9 @@
 ---
 // Terminal app organism: tabs, panels, input and bottom bar, plus the script that runs them
 import CommandMenu from "./CommandMenu.astro";
+import HomeContent from "./HomeContent.astro";
 import InputBar from "./InputBar.astro";
+import LanguageToggle from "./LanguageToggle.astro";
 import MaximizeToggle from "./MaximizeToggle.astro";
 import MessageTemplates from "./MessageTemplates.astro";
 import ShortcutsHint from "./ShortcutsHint.astro";
@@ -10,6 +12,8 @@ import TabBar from "./TabBar.astro";
 import Terminal from "./Terminal.astro";
 import TerminalPanel from "./TerminalPanel.astro";
 import TerminalSession from "./TerminalSession.astro";
+
+const { lang = "id" } = Astro.props;
 ---
 
 <Terminal>
@@ -20,7 +24,7 @@ import TerminalSession from "./TerminalSession.astro";
         <Tab active id="tab-1" controls="panel-1">Terminal</Tab>
     </TabBar>
     <TerminalPanel id="panel-home" labelledby="tab-home" hidden page>
-        <p>Coming soon.</p>
+        <HomeContent lang={lang} />
     </TerminalPanel>
     <TerminalPanel id="panel-projects" labelledby="tab-projects" hidden page>
         <p>Coming soon.</p>
@@ -29,7 +33,7 @@ import TerminalSession from "./TerminalSession.astro";
         <p>Coming soon.</p>
     </TerminalPanel>
     <TerminalPanel id="panel-1" labelledby="tab-1">
-        <TerminalSession />
+        <TerminalSession lang={lang} />
     </TerminalPanel>
     <div slot="input">
         <CommandMenu />
@@ -44,6 +48,7 @@ import TerminalSession from "./TerminalSession.astro";
             <button type="button" class="quick" data-command="/contact">/contact</button>
         </div>
         <div class="status">
+            <LanguageToggle lang={lang} />
             <ShortcutsHint />
             <MaximizeToggle />
         </div>
@@ -58,7 +63,7 @@ import TerminalSession from "./TerminalSession.astro";
 
 <template id="panel-template">
     <TerminalPanel hidden>
-        <TerminalSession />
+        <TerminalSession lang={lang} />
     </TerminalPanel>
 </template>
 
@@ -436,5 +441,21 @@ import TerminalSession from "./TerminalSession.astro";
         }
     });
 
-    activate(tablist.querySelector('[aria-selected="true"]'));
+    output.addEventListener("click", (event) => {
+        if (!event.target.closest("[data-open-terminal]")) return;
+        const targetTab = lastTerminalTab?.isConnected ? lastTerminalTab : document.getElementById("tab-1");
+        activate(targetTab);
+        document.dispatchEvent(new CustomEvent("terminal:focus"));
+    });
+
+    let initialTab = tablist.querySelector('[aria-selected="true"]');
+    try {
+        const savedTabId = sessionStorage.getItem("terminal-active-tab");
+        if (savedTabId) {
+            sessionStorage.removeItem("terminal-active-tab");
+            const savedTab = document.getElementById(savedTabId);
+            if (savedTab && savedTab.getAttribute("role") === "tab") initialTab = savedTab;
+        }
+    } catch {}
+    activate(initialTab);
 </script>

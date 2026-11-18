@@ -1,0 +1,114 @@
+---
+// Language switch button: sits in the bottom-right .status bar to the left of "? shortcuts"
+const { lang = "id" } = Astro.props;
+const isId = lang !== "en";
+const targetHref = isId ? "/en/" : "/";
+const ariaLabel = isId ? "Bahasa Indonesia aktif. Ganti ke Bahasa Inggris (EN)" : "English active. Switch to Bahasa Indonesia (ID)";
+---
+
+<button
+    type="button"
+    class="lang-toggle bar-button"
+    data-target-href={targetHref}
+    aria-label={ariaLabel}
+>
+    <span class:list={["lang-item", { active: isId }]}>
+        <svg class="flag" viewBox="0 0 14 10" width="14" height="10" aria-hidden="true">
+            <rect width="14" height="5" fill="#e11d48" />
+            <rect y="5" width="14" height="5" fill="#ffffff" />
+        </svg>
+        <span class="code">ID</span>
+    </span>
+    <span class="sep" aria-hidden="true">|</span>
+    <span class:list={["lang-item", { active: !isId }]}>
+        <svg class="flag" viewBox="0 0 14 10" width="14" height="10" aria-hidden="true">
+            <rect width="14" height="10" fill="#012169" />
+            <path d="M0,0 L14,10 M14,0 L0,10" stroke="#ffffff" stroke-width="2" />
+            <path d="M0,0 L14,10 M14,0 L0,10" stroke="#c8102e" stroke-width="1" />
+            <path d="M7,0 V10 M0,5 H14" stroke="#ffffff" stroke-width="3.2" />
+            <path d="M7,0 V10 M0,5 H14" stroke="#c8102e" stroke-width="1.8" />
+        </svg>
+        <span class="code">EN</span>
+    </span>
+</button>
+
+<style>
+    .lang-toggle {
+        gap: var(--space-2);
+    }
+
+    .lang-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-weight: 400;
+        color: var(--term-muted);
+    }
+
+    .lang-item.active {
+        font-weight: 700;
+        color: var(--color-ink);
+    }
+
+    .flag {
+        display: block;
+        flex-shrink: 0;
+        border: 1px solid var(--color-ink);
+        border-radius: 1px;
+    }
+
+    .sep {
+        color: var(--term-muted);
+        opacity: 0.6;
+    }
+
+    @media (hover: hover) {
+        .lang-toggle:hover .lang-item,
+        .lang-toggle:hover .sep {
+            color: var(--color-bg);
+        }
+
+        .lang-toggle:hover .lang-item:not(.active) {
+            opacity: 0.75;
+        }
+
+        .lang-toggle:hover .flag {
+            border-color: var(--color-bg);
+        }
+    }
+
+    .lang-toggle:focus-visible .lang-item,
+    .lang-toggle:focus-visible .sep {
+        color: var(--color-bg);
+    }
+
+    .lang-toggle:focus-visible .lang-item:not(.active) {
+        opacity: 0.75;
+    }
+
+    .lang-toggle:focus-visible .flag {
+        border-color: var(--color-bg);
+    }
+</style>
+
+<script>
+    const button = document.querySelector(".lang-toggle");
+
+    button?.addEventListener("click", () => {
+        const href = button.getAttribute("data-target-href");
+        if (!href) return;
+
+        try {
+            const selected = document.querySelector('[role="tablist"] [role="tab"][aria-selected="true"]');
+            if (selected?.id) {
+                // Keep static tabs (tab-home, tab-projects, tab-cv) or fall back to tab-1
+                const tabId = selected.id.startsWith("tab-") && !/^tab-[2-6]$/.test(selected.id)
+                    ? selected.id
+                    : "tab-1";
+                sessionStorage.setItem("terminal-active-tab", tabId);
+            }
+        } catch {}
+
+        window.location.href = href;
+    });
+</script>

@@ -4,10 +4,10 @@ import { Font } from "astro:assets";
 import "../styles/tokens.css";
 import "../styles/global.css";
 
-const { title = "NafisApp" } = Astro.props;
+const { title = "NafisApp", lang = "id" } = Astro.props;
 ---
 
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />

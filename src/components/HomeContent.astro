@@ -1,0 +1,196 @@
+---
+import { getProfile } from "../data/profile.js";
+import Button from "./Button.astro";
+import Card from "./Card.astro";
+import Tag from "./Tag.astro";
+
+const { lang = "id" } = Astro.props;
+const { home, contact } = getProfile(lang);
+---
+
+<div class="home">
+    <header class="hero">
+        <div class="hero-tag">
+            <Tag variant="primary">{home.badge}</Tag>
+        </div>
+        <h2 class="hero-name">{home.name}</h2>
+        <p class="hero-headline">{home.headline}</p>
+        <p class="hero-intro">{home.intro}</p>
+    </header>
+
+    <section class="section" aria-labelledby="home-pillars-title">
+        <h3 id="home-pillars-title" class="section-title">{home.pillarsTitle}</h3>
+        <div class="pillars">
+            {
+                home.pillars.map((pillar) => (
+                    <Card tag={pillar.tag} tagVariant={pillar.variant}>
+                        <h4 class="pillar-title">{pillar.title}</h4>
+                        <p class="pillar-desc">{pillar.desc}</p>
+                    </Card>
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="home-contact-title">
+        <h3 id="home-contact-title" class="section-title">{home.contactTitle}</h3>
+        <ul class="contact-list" role="list">
+            {
+                contact.map((item) => (
+                    <li>
+                        <a
+                            class="contact-link"
+                            href={item.href}
+                            target={item.href.startsWith("http") ? "_blank" : undefined}
+                            rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                        >
+                            <span>{item.label}</span>
+                            {item.href.startsWith("http") && (
+                                <span aria-hidden="true" class="ext"> ↗</span>
+                            )}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </section>
+
+    <aside class="cta">
+        <div class="cta-copy">
+            <h3 class="cta-title">{home.terminalCtaTitle}</h3>
+            <p class="cta-text">{home.terminalCtaText}</p>
+        </div>
+        <Button variant="primary">
+            <span data-open-terminal>{home.terminalCtaButton}</span>
+        </Button>
+    </aside>
+</div>
+
+<style>
+    .home {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+        padding-block: var(--space-3) var(--space-5);
+    }
+
+    .hero {
+        background: var(--color-bg);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-ink);
+        padding: var(--space-5);
+    }
+
+    .hero-tag {
+        margin-bottom: var(--space-3);
+    }
+
+    .hero-name {
+        font-family: var(--font-display);
+        font-size: var(--text-xl);
+        margin: 0 0 var(--space-3);
+    }
+
+    .hero-headline {
+        font-weight: 700;
+        font-size: var(--text-md);
+        margin: 0 0 var(--space-3);
+    }
+
+    .hero-intro {
+        color: var(--term-muted);
+        font-size: var(--text-sm);
+        margin: 0;
+    }
+
+    .section-title {
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        margin: 0 0 var(--space-4);
+    }
+
+    .pillars {
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--space-5) + var(--space-3));
+        padding-top: var(--space-4);
+    }
+
+    .pillar-title {
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        margin: 0 0 var(--space-2);
+    }
+
+    .pillar-desc {
+        font-size: var(--text-sm);
+        color: var(--color-ink);
+        margin: 0;
+    }
+
+    .contact-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+
+    .contact-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        background: var(--color-bg);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        padding: var(--space-2) var(--space-3);
+        box-shadow: var(--shadow-offset-sm) var(--shadow-offset-sm) 0 var(--color-ink);
+        transition: background-color var(--speed), translate var(--speed), box-shadow var(--speed);
+    }
+
+    @media (hover: hover) {
+        .contact-link:hover {
+            background: var(--color-accent);
+            translate: calc(var(--lift) * -1) calc(var(--lift) * -1);
+            box-shadow:
+                calc(var(--shadow-offset-sm) + var(--lift))
+                calc(var(--shadow-offset-sm) + var(--lift))
+                0 var(--color-ink);
+        }
+    }
+
+    .contact-link:focus-visible {
+        outline: var(--border-width) solid var(--color-ink);
+        outline-offset: var(--space-1);
+    }
+
+    .cta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        border-top: var(--border-width) solid var(--color-ink);
+        padding-top: var(--space-5);
+    }
+
+    .cta-copy {
+        flex: 1 1 20rem;
+    }
+
+    .cta-title {
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        margin: 0 0 var(--space-1);
+    }
+
+    .cta-text {
+        font-size: var(--text-sm);
+        color: var(--term-muted);
+        margin: 0;
+    }
+</style>
