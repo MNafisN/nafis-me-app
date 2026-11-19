@@ -3,6 +3,10 @@
 
 export const profiles = {
     id: {
+        meta: {
+            title: "Mohammad Nafis Naufally — CTO, Backend & Cloud Engineer",
+            description: "Portofolio Mohammad Nafis Naufally — CTO di PT. Global Bisnis Teknologi (GLOBISTEC), Software Engineer (Laravel, Python) & Cloud Infrastructure Advisor (Tencent Cloud, Alibaba Cloud ACP/ACA).",
+        },
         ui: {
             banner: "Selamat datang di Terminal NafisApp. Pilih aksi cepat di bawah, atau ketik pesan.",
             commandsTitle: "Perintah",
@@ -56,12 +60,42 @@ export const profiles = {
             terminalCtaText: "Buka tab Terminal untuk menjalankan perintah seperti /projects, /project goodlink-ecosystem, atau /cv.",
             terminalCtaButton: "Buka Terminal",
         },
+        projectsPage: {
+            badge: "Portofolio & Arsitektur Sistem",
+            title: "Proyek & Ekosistem Digital",
+            intro: "Rangkaian sistem produksi yang saya rancang, pimpin, dan kelola di PT. Global Bisnis Teknologi (GLOBISTEC / Qbiztec) — mulai dari aplikasi koperasi digital, jembatan pembayaran PPOB, arsitektur multi-cloud Docker, hingga AI agent otonom.",
+            groups: [
+                {
+                    title: "1. Platform Inti & Jembatan Pembayaran",
+                    subtitle: "Aplikasi bisnis multi-klien dan sistem transaksi berkeandalan tinggi.",
+                    items: ["goodlink-ecosystem", "payment-adapter"],
+                },
+                {
+                    title: "2. Infrastruktur AI & Agen Otonom",
+                    subtitle: "Otomasi operasional server dan pengelolaan endpoint model AI.",
+                    items: ["ai-agent-ops", "pusattoken-ai"],
+                },
+                {
+                    title: "3. Arsitektur Cloud, DevOps & Web",
+                    subtitle: "Server produksi Linux/Docker, CI/CD 14 repositori, dan rekayasa antarmuka.",
+                    items: ["cloud-devops", "nafis-me-app"],
+                },
+            ],
+            highlightsTitle: "Cakupan Ekosistem (17 Sistem & Inisiatif)",
+            highlights: [
+                { label: "Aplikasi Inti", text: "GoodLink Host & Client (8 koperasi digital), KiosOke (marketplace), D'antar (ekspedisi)" },
+                { label: "Pembayaran & PPOB", text: "Payment Adapter (Laravel/Filament/Redis), MME Aggregator (.NET), TokoAtlas, KHOINS Android" },
+                { label: "Cloud & Server", text: "Tencent Cloud (GoodLink, Host, GoodWater), BiznetGio Docker, Cloudflare Edge (GoodMedis)" },
+                { label: "AI & Otomasi", text: "Server AI Agent (Python/Shell), PusatTokenAI Gateway, LiteLLM Health Monitor, Kolegaku (Odoo AI), n8n + ClickUp/Discord Ops" },
+            ],
+        },
         projects: [
             {
                 slug: "goodlink-ecosystem",
                 title: "GoodLink, KiosOke & D'antar",
                 desc: "Ekosistem koperasi digital (8 koperasi aktif), marketplace, dan layanan pengantaran berbasis Laravel 11 DDD & MariaDB.",
                 tag: "Laravel 11",
+                stack: ["Laravel 11 (DDD)", "MariaDB", "PHPUnit / Feature Test", "Postman"],
                 details: "Memimpin pengembangan GoodLink Host & Client (aplikasi koperasi digital yang saat ini digunakan oleh 8 koperasi di Jawa Timur), KiosOke (marketplace), dan D'antar (pengantaran).\nMemimpin refactoring GoodLink Client ke Laravel 11 dengan arsitektur modular Domain-Driven Design (DDD), dilengkapi pengujian feature test Laravel dan pengujian API Postman.",
             },
             {
@@ -69,6 +103,7 @@ export const profiles = {
                 title: "Payment Adapter & PPOB Bridge",
                 desc: "Jembatan transaksi antara GoodLink dengan agregator PPOB MME dan TokoAtlas menggunakan Laravel, Filament, Redis, dan MariaDB.",
                 tag: "Payment",
+                stack: ["Laravel", "Filament", "Redis", "MariaDB", ".NET (MME)"],
                 details: "Merancang sistem Payment Adapter dari awal mulai dari dokumen spesifikasi SKPL hingga manajemen proyek dengan SDLC dan Agile.\nDibangun menggunakan Laravel, Filament, Redis, dan MariaDB untuk menghubungkan GoodLink Client dengan agregator biller PPOB MME (.NET via VNC) dan TokoAtlas, termasuk integrasi aplikasi Android whitelabel KHOINS.",
             },
             {
@@ -76,6 +111,7 @@ export const profiles = {
                 title: "GLOBISTEC Autonomous Server AI Agent",
                 desc: "AI agent pengelolaan server Debian yang dibangun dari nol dengan Python & shell script, terhubung ke Slack, Telegram, Discord, dan API.",
                 tag: "Python AI",
+                stack: ["Python", "Shell Script", "Debian", "Slack / Telegram / Discord", "Kolegaku (Odoo)"],
                 details: "Membangun AI agent otonom dari nol menggunakan Python dan shell script di atas server Debian yang dibekali basis pengetahuan internal GLOBISTEC.\nAgent ini mampu memeriksa dan mengelola server secara mandiri melalui Slack, Telegram, Discord, maupun pemanggilan HTTP API, berdampingan dengan pemeliharaan platform orkestrasi agen Kolegaku berbasis Odoo.",
             },
             {
@@ -83,6 +119,7 @@ export const profiles = {
                 title: "PusatTokenAI & Model Health Monitor",
                 desc: "Layanan gateway API berbagai model AI kompatibel OpenAI beserta pemantauan kesehatan endpoint menggunakan LiteLLM.",
                 tag: "LiteLLM",
+                stack: ["OpenAI-Compatible API", "LiteLLM", "Linux Server"],
                 details: "Menjaga ketersediaan endpoint dan memasarkan PusatTokenAI, layanan akses beragam model AI melalui satu endpoint yang kompatibel dengan OpenAI (berbayar per panggilan API).\nMengonfigurasi sistem pemantauan kesehatan model menggunakan LiteLLM untuk menguji ketersediaan seluruh model yang terdaftar secara berkala.",
             },
             {
@@ -90,6 +127,7 @@ export const profiles = {
                 title: "Multi-Cloud Docker & 14-Repo DevOps",
                 desc: "Infrastruktur Docker di Tencent Cloud & BiznetGio, CI/CD 14 repositori GitHub, serta otomasi pemantauan tugas dengan n8n.",
                 tag: "Cloud / DevOps",
+                stack: ["Tencent Cloud", "BiznetGio", "Docker", "Ubuntu / Debian", "GitHub Actions", "n8n"],
                 details: "Mengelola server Ubuntu dan Debian yang menjalankan aplikasi Docker (GoodLink, GoodLink Host, GoodWater) di Tencent Cloud dan BiznetGio, termasuk perancangan VPC, firewall, routing, snapshot, backup, dan DNS Cloudflare (GoodMedis).\nMengatur 14 repositori GitHub Organization dengan aturan branch dan CI/CD otomatis, logging aplikasi ke Discord/Slack, serta otomasi pemantauan tugas ClickUp dengan n8n dan JavaScript.",
             },
             {
@@ -97,10 +135,125 @@ export const profiles = {
                 title: "Terminal Portfolio (nafis-me-app)",
                 desc: "Situs personal bergaya terminal Claude Code dengan tema terang, tab interaktif, dan dukungan multibahasa.",
                 tag: "Astro",
-                href: "https://github.com/MNafisN/nafis-me-app",
+                stack: ["Astro", "Vanilla CSS", "JavaScript", "Docker"],
                 details: "Situs personal yang dibangun dengan Astro dan CSS murni tanpa framework eksternal.\nMenggabungkan antarmuka terminal interaktif (perintah slash, pelengkapan otomatis, dan riwayat pesan) dengan tampilan halaman terpusat dalam bahasa Indonesia dan Inggris.",
             },
         ],
+        cvPage: {
+            badge: "Curriculum Vitae",
+            name: "Mohammad Nafis Naufally",
+            role: "CTO di PT. Global Bisnis Teknologi (GLOBISTEC) · B.Comp.Sc. ITS Surabaya",
+            location: "Jawa Timur, Indonesia",
+            summary: "Lulusan Informatika yang berfokus pada software engineering dan infrastructure development. Berpengalaman dalam memimpin tim proyek, arsitektur sistem, server & cloud, database, serta software dan API testing.",
+            downloadLabel: "Unduh CV Lengkap (PDF)",
+            pdf: "/files/cv.pdf",
+            experienceTitle: "Pengalaman Kerja",
+            experience: [
+                {
+                    role: "Chief Technology Officer (CTO)",
+                    company: "PT. Global Bisnis Teknologi (GLOBISTEC)",
+                    location: "Surabaya, Indonesia",
+                    period: "Okt 2023 – Sekarang",
+                    tag: "Saat Ini",
+                    subtitle: "Perusahaan IT dengan produk ekosistem digital untuk bisnis, koperasi, dan komunitas di Jawa Timur.",
+                    bullets: [
+                        "Mengembangkan GoodLink Client (dipakai 8 klien koperasi digital), KiosOke (marketplace), dan D'antar (pengantaran) dengan Laravel dan MariaDB, serta memimpin refactoring ke Laravel 11 modular (Domain-Driven Design).",
+                        "Merancang sistem Payment Adapter dari dokumen SKPL hingga produksi dengan konsep SDLC & Agile (Laravel, Filament, Redis, MariaDB) untuk menghubungkan GoodLink dengan PPOB Merchant Aggregator.",
+                        "Menulis feature test pada backend Laravel dan menguji API dengan Postman.",
+                        "Mengatur proses kerja tim: GitHub Organization dengan 14 repositori (branch rule & CI/CD otomatis), manajemen proyek lewat ClickUp dan Discord, serta logging aplikasi di Discord dan Slack.",
+                        "Mengelola server Ubuntu dan Debian di Tencent Cloud dan BiznetGio berbasis Docker, serta menyusun arsitektur VPC, firewall, routing, snapshot, dan backup di Tencent Cloud.",
+                        "Memelihara sistem PPOB Merchant Aggregator dari vendor MME (.NET via VNC) yang terhubung ke Payment Adapter.",
+                        "Membangun AI agent dari nol dengan Python dan shell script di server Debian dengan basis pengetahuan GLOBISTEC untuk manajemen server mandiri lewat Slack, Telegram, Discord, atau API.",
+                        "Mendampingi calon klien sebagai reseller Tencent Cloud (penjelasan produk, penghitungan kapasitas server, dokumentasi instalasi), menjaga ketersediaan endpoint PusatTokenAI, serta membangun otomasi pemantauan tugas ClickUp dengan n8n.",
+                    ],
+                },
+                {
+                    role: "Admin IT",
+                    company: "Pemerintah Daerah Desa Banjartanggul",
+                    location: "Mojokerto, Indonesia",
+                    period: "Des 2021 – Des 2022",
+                    bullets: [
+                        "Membantu pemerintah daerah dalam pelaksanaan program nasional sertifikasi tanah di Banjartanggul.",
+                        "Mengumpulkan dan memverifikasi data sejarah kepemilikan lebih dari 580 bidang tanah sebagai berkas persyaratan sertifikasi.",
+                        "Mengelola dan menyinkronkan data lebih dari 1.030 bidang tanah dengan Badan Pertanahan Nasional (BPN).",
+                    ],
+                },
+                {
+                    role: "IT Intern",
+                    company: "PT. PJB (Anak Perusahaan PT. PLN Indonesia)",
+                    location: "Surabaya, Indonesia",
+                    period: "Jun 2019 – Agu 2019",
+                    bullets: [
+                        "Membuat 10+ generator dan penyortir input data serta membantu sentralisasi data internal perusahaan.",
+                        "Terlibat dalam diskusi strategi peningkatan UI/UX situs web perusahaan serta melakukan analisis data kinerja kampanye.",
+                        "Membangun prototipe situs web sistem informasi manajemen jadwal rapat perusahaan.",
+                    ],
+                },
+            ],
+            educationTitle: "Pendidikan & Organisasi",
+            education: [
+                {
+                    degree: "Sarjana Ilmu Komputer / Informatika (B.Comp.Sc.)",
+                    school: "Institut Teknologi Sepuluh Nopember (ITS)",
+                    location: "Surabaya, Indonesia",
+                    period: "Agu 2016 – Sep 2022",
+                    badge: "IPK 3.34 / 4.00",
+                    bullets: [
+                        "Rumpun mata kuliah utama: Pengembangan Perangkat Lunak (Website).",
+                        "Aktif mengikuti 10+ kegiatan kampus, kepanitiaan organisasi, dan lokakarya keterampilan teknis.",
+                    ],
+                },
+                {
+                    degree: "Staf Keamanan Acara",
+                    school: "UKM IFLS ITS (Foreign Language Society)",
+                    location: "Surabaya, Indonesia",
+                    period: "Sep 2018 – Sep 2019",
+                    bullets: [
+                        "Bertanggung jawab menjaga keamanan jalannya acara organisasi pada 2 agenda besar tahunan.",
+                    ],
+                },
+            ],
+            skillsTitle: "Keterampilan Teknis",
+            skills: [
+                { group: "Backend", items: ["PHP", "Laravel 11 (DDD)", "Filament", "Python", "JavaScript"] },
+                { group: "Database", items: ["MariaDB / MySQL", "Redis", "MongoDB"] },
+                { group: "Server & Cloud", items: ["Docker", "Nginx", "Ubuntu", "Debian", "Tencent Cloud", "BiznetGio", "Cloudflare"] },
+                { group: "Testing & Otomasi", items: ["Laravel Feature Test", "Postman API Testing", "GitHub Actions CI/CD", "n8n", "LiteLLM", "Playwright (Python)"] },
+            ],
+            certsTitle: "Sertifikasi & Pelatihan",
+            certs: [
+                {
+                    year: "2024",
+                    title: "Alibaba Cloud Certified Professional (ACP)",
+                    issuer: "Alibaba Cloud",
+                    desc: "Sertifikasi tingkat profesional untuk operasional, implementasi, arsitektur, dan administrasi cloud lanjutan.",
+                },
+                {
+                    year: "2024",
+                    title: "Alibaba Cloud Certified Associate (ACA)",
+                    issuer: "Alibaba Cloud",
+                    desc: "Sertifikasi fundamental konsep komputasi awan dan layanan inti Alibaba Cloud.",
+                },
+                {
+                    year: "2024",
+                    title: "Manajemen Proyek (Google Project Management)",
+                    issuer: "Google & Coursera",
+                    desc: "Modul pembelajaran pengelolaan proyek dengan pendekatan SDLC dan Agile.",
+                },
+                {
+                    year: "2023",
+                    title: "Cloud Services & Backend Practices",
+                    issuer: "Dicoding Indonesia",
+                    desc: "Modul pembelajaran layanan cloud dan praktik rekayasa backend.",
+                },
+                {
+                    year: "2023",
+                    title: "Software Engineering Bootcamp (Backend Laravel)",
+                    issuer: "Sinergi Peta Sejahtera",
+                    desc: "Bootcamp intensif pengembangan perangkat lunak dengan penugasan di posisi backend engineer Laravel.",
+                },
+            ],
+        },
         cv: {
             role: "CTO di PT. Global Bisnis Teknologi (GLOBISTEC) · B.Comp.Sc. ITS Surabaya",
             summary: [
@@ -117,6 +270,10 @@ export const profiles = {
         ],
     },
     en: {
+        meta: {
+            title: "Mohammad Nafis Naufally — CTO, Backend & Cloud Engineer",
+            description: "Portfolio of Mohammad Nafis Naufally — CTO at PT. Global Bisnis Teknologi (GLOBISTEC), Software Engineer (Laravel, Python) & Cloud Infrastructure Advisor (Tencent Cloud, Alibaba Cloud ACP/ACA).",
+        },
         ui: {
             banner: "Welcome to NafisApp Terminal. Pick a quick action below, or type a message.",
             commandsTitle: "Commands",
@@ -170,12 +327,42 @@ export const profiles = {
             terminalCtaText: "Switch to the Terminal tab to run slash commands like /projects, /project goodlink-ecosystem, or /cv.",
             terminalCtaButton: "Open Terminal",
         },
+        projectsPage: {
+            badge: "Portfolio & System Architecture",
+            title: "Projects & Digital Ecosystem",
+            intro: "Production systems I have architected, led, and operated at PT. Global Bisnis Teknologi (GLOBISTEC / Qbiztec) — spanning digital cooperative platforms, PPOB payment bridges, multi-cloud Docker infrastructure, and autonomous AI agents.",
+            groups: [
+                {
+                    title: "1. Core Platforms & Payment Bridges",
+                    subtitle: "Multi-tenant business applications and high-reliability transaction systems.",
+                    items: ["goodlink-ecosystem", "payment-adapter"],
+                },
+                {
+                    title: "2. AI Infrastructure & Autonomous Agents",
+                    subtitle: "Autonomous server operations and multi-model AI gateway management.",
+                    items: ["ai-agent-ops", "pusattoken-ai"],
+                },
+                {
+                    title: "3. Cloud Architecture, DevOps & Web",
+                    subtitle: "Production Linux/Docker servers, 14-repo CI/CD, and interactive web engineering.",
+                    items: ["cloud-devops", "nafis-me-app"],
+                },
+            ],
+            highlightsTitle: "Full Ecosystem Scope (17 Systems & Initiatives)",
+            highlights: [
+                { label: "Core Apps", text: "GoodLink Host & Client (8 digital cooperatives), KiosOke (marketplace), D'antar (delivery)" },
+                { label: "Payments & PPOB", text: "Payment Adapter (Laravel/Filament/Redis), MME Aggregator (.NET), TokoAtlas, KHOINS Android" },
+                { label: "Cloud & Servers", text: "Tencent Cloud (GoodLink, Host, GoodWater), BiznetGio Docker, Cloudflare Edge (GoodMedis)" },
+                { label: "AI & Automation", text: "Server AI Agent (Python/Shell), PusatTokenAI Gateway, LiteLLM Health Monitor, Kolegaku (Odoo AI), n8n + ClickUp/Discord Ops" },
+            ],
+        },
         projects: [
             {
                 slug: "goodlink-ecosystem",
                 title: "GoodLink, KiosOke & D'antar",
                 desc: "Digital cooperative platform (serving 8 cooperatives), marketplace, and delivery apps built with Laravel 11 DDD & MariaDB.",
                 tag: "Laravel 11",
+                stack: ["Laravel 11 (DDD)", "MariaDB", "PHPUnit / Feature Test", "Postman"],
                 details: "Leading development of GoodLink Host & Client (powering 8 active digital cooperatives in East Java), KiosOke (marketplace), and D'antar (delivery/expedition).\nLed the architectural refactoring of GoodLink Client to Laravel 11 with a modular Domain-Driven Design (DDD) structure, backed by Laravel feature tests and Postman API testing.",
             },
             {
@@ -183,6 +370,7 @@ export const profiles = {
                 title: "Payment Adapter & PPOB Bridge",
                 desc: "Transaction bridge connecting GoodLink with MME and TokoAtlas PPOB biller aggregators using Laravel, Filament, Redis, and MariaDB.",
                 tag: "Payment",
+                stack: ["Laravel", "Filament", "Redis", "MariaDB", ".NET (MME)"],
                 details: "Designed and architected the Payment Adapter from the ground up—starting from the formal SKPL requirements specification through SDLC and Agile delivery.\nBuilt with Laravel, Filament, Redis, and MariaDB to connect GoodLink Client with MME (.NET PPOB aggregator maintained via VNC) and TokoAtlas, alongside KHOINS white-label Android integration.",
             },
             {
@@ -190,6 +378,7 @@ export const profiles = {
                 title: "GLOBISTEC Autonomous Server AI Agent",
                 desc: "Debian server-management AI agent built from scratch with Python & shell scripts, accessible via Slack, Telegram, Discord, and API.",
                 tag: "Python AI",
+                stack: ["Python", "Shell Script", "Debian", "Slack / Telegram / Discord", "Kolegaku (Odoo)"],
                 details: "Built an autonomous AI agent from scratch using Python and shell scripts on a Debian server, grounded in GLOBISTEC's internal knowledge base.\nCapable of inspecting and managing server operations autonomously via Slack, Telegram, Discord, or HTTP API, alongside deploying and maintaining the Odoo-based Kolegaku agent orchestration platform.",
             },
             {
@@ -197,6 +386,7 @@ export const profiles = {
                 title: "PusatTokenAI & Model Health Monitor",
                 desc: "OpenAI-compatible multi-model AI API gateway paired with automated LiteLLM endpoint health monitoring.",
                 tag: "LiteLLM",
+                stack: ["OpenAI-Compatible API", "LiteLLM", "Linux Server"],
                 details: "Maintained endpoint availability and technical marketing for PusatTokenAI, a pay-per-call OpenAI-compatible gateway providing unified access to multiple AI models.\nConfigured and operated LiteLLM health checks to continuously monitor every model endpoint listed on the platform.",
             },
             {
@@ -204,6 +394,7 @@ export const profiles = {
                 title: "Multi-Cloud Docker & 14-Repo DevOps",
                 desc: "Tencent Cloud & BiznetGio Docker infrastructure, 14-repo GitHub CI/CD pipelines, and n8n workflow automation.",
                 tag: "Cloud / DevOps",
+                stack: ["Tencent Cloud", "BiznetGio", "Docker", "Ubuntu / Debian", "GitHub Actions", "n8n"],
                 details: "Operated Ubuntu and Debian Docker hosts (GoodLink, GoodLink Host, GoodWater) across Tencent Cloud and BiznetGio, including VPC architecture, firewalls, routing, snapshots, backups, and Cloudflare DNS (GoodMedis).\nManaged 14 repositories in the GLOBISTEC & Qbiztec GitHub Organization with branch rules and automated CI/CD, Discord/Slack app logging, and JavaScript n8n automations for ClickUp task tracking.",
             },
             {
@@ -211,10 +402,125 @@ export const profiles = {
                 title: "Terminal Portfolio (nafis-me-app)",
                 desc: "This Claude Code-inspired light-theme terminal website with interactive tabs and bilingual support.",
                 tag: "Astro",
-                href: "https://github.com/MNafisN/nafis-me-app",
+                stack: ["Astro", "Vanilla CSS", "JavaScript", "Docker"],
                 details: "Personal website built with Astro and vanilla CSS custom properties.\nCombines an interactive terminal session (slash commands, autocomplete, and command history) with centered static page views in Indonesian and English.",
             },
         ],
+        cvPage: {
+            badge: "Curriculum Vitae",
+            name: "Mohammad Nafis Naufally",
+            role: "CTO at PT. Global Bisnis Teknologi (GLOBISTEC) · B.Comp.Sc. ITS Surabaya",
+            location: "East Java, Indonesia",
+            summary: "Computer Science graduate focused on software engineering and infrastructure development. Experienced in engineering leadership, system architecture, Linux servers & cloud, databases, and software/API testing.",
+            downloadLabel: "Download Full CV (PDF)",
+            pdf: "/files/cv.pdf",
+            experienceTitle: "Work Experience",
+            experience: [
+                {
+                    role: "Chief Technology Officer (CTO)",
+                    company: "PT. Global Bisnis Teknologi (GLOBISTEC)",
+                    location: "Surabaya, Indonesia",
+                    period: "Oct 2023 – Present",
+                    tag: "Current",
+                    subtitle: "IT company building a connected digital ecosystem for businesses, cooperatives, and communities in East Java.",
+                    bullets: [
+                        "Developed GoodLink Client (powering 8 active digital cooperatives), KiosOke (marketplace), and D'antar (delivery) using Laravel and MariaDB; led the modular Domain-Driven Design (DDD) refactoring to Laravel 11.",
+                        "Architected the Payment Adapter from formal SKPL specs to production using SDLC & Agile practices (Laravel, Filament, Redis, MariaDB) to bridge GoodLink Client with PPOB Merchant Aggregators.",
+                        "Authored Laravel backend feature tests and validated APIs with Postman.",
+                        "Established team engineering workflows: a 14-repository GitHub Organization (branch protection & automated CI/CD), project tracking via ClickUp and Discord, and real-time application logging to Discord and Slack.",
+                        "Managed Ubuntu and Debian Docker servers on Tencent Cloud and BiznetGio, including designing VPCs, firewalls, routing rules, snapshots, and backups on Tencent Cloud.",
+                        "Maintained the vendor-provided MME PPOB Merchant Aggregator (.NET via VNC) connected to the Payment Adapter.",
+                        "Built an autonomous AI agent from scratch in Python and shell scripts on Debian with GLOBISTEC's knowledge base, capable of managing servers via Slack, Telegram, Discord, or HTTP API.",
+                        "Represented Tencent Cloud as a technical reseller (client consulting, server sizing, installation docs), maintained PusatTokenAI endpoint availability, and built ClickUp task-monitoring automations with n8n.",
+                    ],
+                },
+                {
+                    role: "IT Administrator",
+                    company: "Banjartanggul Local Government (Pemerintah Daerah)",
+                    location: "Mojokerto, Indonesia",
+                    period: "Dec 2021 – Dec 2022",
+                    bullets: [
+                        "Supported the local government in executing the national land certification program in Banjartanggul.",
+                        "Compiled and verified historical ownership records for 580+ land parcels required for certification filings.",
+                        "Managed and synchronized records for 1,030+ land parcels with the National Land Agency (Badan Pertanahan Nasional).",
+                    ],
+                },
+                {
+                    role: "IT Intern",
+                    company: "PT. PJB (Subsidiary of PT. PLN Indonesia)",
+                    location: "Surabaya, Indonesia",
+                    period: "Jun 2019 – Aug 2019",
+                    bullets: [
+                        "Built 10+ data input generators and sorters and contributed to centralizing internal company datasets.",
+                        "Participated in UI/UX strategy discussions for the corporate website and analyzed campaign performance data.",
+                        "Built a web prototype for the company's meeting-schedule management information system.",
+                    ],
+                },
+            ],
+            educationTitle: "Education & Organizations",
+            education: [
+                {
+                    degree: "Bachelor of Computer Science (B.Comp.Sc.)",
+                    school: "Institut Teknologi Sepuluh Nopember (ITS)",
+                    location: "Surabaya, Indonesia",
+                    period: "Aug 2016 – Sep 2022",
+                    badge: "GPA 3.34 / 4.00",
+                    bullets: [
+                        "Focus area: Software Engineering (Web Development).",
+                        "Actively participated in 10+ campus events, organizational committees, and technical skill workshops.",
+                    ],
+                },
+                {
+                    degree: "Event Security Staff",
+                    school: "UKM IFLS ITS (Foreign Language Society)",
+                    location: "Surabaya, Indonesia",
+                    period: "Sep 2018 – Sep 2019",
+                    bullets: [
+                        "Managed event security and operations across 2 major annual organization events.",
+                    ],
+                },
+            ],
+            skillsTitle: "Technical Skills",
+            skills: [
+                { group: "Backend", items: ["PHP", "Laravel 11 (DDD)", "Filament", "Python", "JavaScript"] },
+                { group: "Database", items: ["MariaDB / MySQL", "Redis", "MongoDB"] },
+                { group: "Server & Cloud", items: ["Docker", "Nginx", "Ubuntu", "Debian", "Tencent Cloud", "BiznetGio", "Cloudflare"] },
+                { group: "Testing & Automation", items: ["Laravel Feature Test", "Postman API Testing", "GitHub Actions CI/CD", "n8n", "LiteLLM", "Playwright (Python)"] },
+            ],
+            certsTitle: "Certifications & Training",
+            certs: [
+                {
+                    year: "2024",
+                    title: "Alibaba Cloud Certified Professional (ACP)",
+                    issuer: "Alibaba Cloud",
+                    desc: "Professional-level certification covering advanced cloud architecture, implementation, operations, and administration.",
+                },
+                {
+                    year: "2024",
+                    title: "Alibaba Cloud Certified Associate (ACA)",
+                    issuer: "Alibaba Cloud",
+                    desc: "Foundational certification in cloud computing concepts and core Alibaba Cloud services.",
+                },
+                {
+                    year: "2024",
+                    title: "Google Project Management",
+                    issuer: "Google & Coursera",
+                    desc: "Project management coursework covering SDLC and Agile delivery practices.",
+                },
+                {
+                    year: "2023",
+                    title: "Cloud Services & Backend Practices",
+                    issuer: "Dicoding Indonesia",
+                    desc: "Structured coursework on cloud infrastructure and backend engineering best practices.",
+                },
+                {
+                    year: "2023",
+                    title: "Software Engineering Bootcamp (Backend Laravel)",
+                    issuer: "Sinergi Peta Sejahtera",
+                    desc: "Intensive software engineering bootcamp serving as a Laravel backend developer.",
+                },
+            ],
+        },
         cv: {
             role: "CTO at PT. Global Bisnis Teknologi (GLOBISTEC) · B.Comp.Sc. ITS Surabaya",
             summary: [

@@ -1,0 +1,350 @@
+---
+import { getProfile } from "../data/profile.js";
+import Card from "./Card.astro";
+import Tag from "./Tag.astro";
+
+const { lang = "id" } = Astro.props;
+const { cvPage } = getProfile(lang);
+---
+
+<div class="cv-page">
+    <header class="hero">
+        <div class="hero-top">
+            <div class="hero-copy">
+                <div class="hero-tag">
+                    <Tag variant="primary">{cvPage.badge}</Tag>
+                </div>
+                <h2 class="hero-name">{cvPage.name}</h2>
+                <p class="hero-role">{cvPage.role}</p>
+                <p class="hero-location">{cvPage.location}</p>
+            </div>
+            <a
+                class="download-btn"
+                href={cvPage.pdf}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                {cvPage.downloadLabel} <span aria-hidden="true">↗</span>
+            </a>
+        </div>
+        <p class="hero-summary">{cvPage.summary}</p>
+    </header>
+
+    <section class="section" aria-labelledby="cv-exp-title">
+        <h3 id="cv-exp-title" class="section-title">{cvPage.experienceTitle}</h3>
+        <div class="timeline">
+            {
+                cvPage.experience.map((job) => (
+                    <Card tag={job.period} tagVariant={job.tag ? "primary" : "secondary"}>
+                        <div class="entry-head">
+                            <div>
+                                <h4 class="entry-role">{job.role}</h4>
+                                <p class="entry-org">{job.company} · {job.location}</p>
+                            </div>
+                        </div>
+                        {job.subtitle && <p class="entry-subtitle">{job.subtitle}</p>}
+                        <ul class="bullet-list">
+                            {job.bullets.map((bullet) => (
+                                <li>{bullet}</li>
+                            ))}
+                        </ul>
+                    </Card>
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="cv-edu-title">
+        <h3 id="cv-edu-title" class="section-title">{cvPage.educationTitle}</h3>
+        <div class="timeline">
+            {
+                cvPage.education.map((edu, index) => (
+                    <Card tag={edu.period} tagVariant={index === 0 ? "primary" : "secondary"}>
+                        <div class="entry-head">
+                            <div>
+                                <h4 class="entry-role">{edu.degree}</h4>
+                                <p class="entry-org">{edu.school} · {edu.location}</p>
+                            </div>
+                            {edu.badge && <span class="gpa-badge">{edu.badge}</span>}
+                        </div>
+                        <ul class="bullet-list">
+                            {edu.bullets.map((bullet) => (
+                                <li>{bullet}</li>
+                            ))}
+                        </ul>
+                    </Card>
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="cv-skills-title">
+        <h3 id="cv-skills-title" class="section-title">{cvPage.skillsTitle}</h3>
+        <div class="skills-box">
+            {
+                cvPage.skills.map((group) => (
+                    <div class="skill-row">
+                        <span class="skill-group">{group.group}</span>
+                        <ul class="skill-items" role="list">
+                            {group.items.map((item) => (
+                                <li class="skill-pill">{item}</li>
+                            ))}
+                        </ul>
+                    </div>
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="cv-certs-title">
+        <h3 id="cv-certs-title" class="section-title">{cvPage.certsTitle}</h3>
+        <ul class="certs-list" role="list">
+            {
+                cvPage.certs.map((cert) => (
+                    <li class="cert-card">
+                        <div class="cert-head">
+                            <h4 class="cert-title">{cert.title}</h4>
+                            <span class="cert-meta">{cert.issuer} · {cert.year}</span>
+                        </div>
+                        <p class="cert-desc">{cert.desc}</p>
+                    </li>
+                ))
+            }
+        </ul>
+    </section>
+</div>
+
+<style>
+    .cv-page {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+        padding-block: var(--space-3) var(--space-5);
+    }
+
+    .hero {
+        background: var(--color-bg);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-ink);
+        padding: var(--space-5);
+    }
+
+    .hero-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--space-4);
+        margin-bottom: var(--space-3);
+    }
+
+    .hero-tag {
+        margin-bottom: var(--space-3);
+    }
+
+    .hero-name {
+        font-family: var(--font-display);
+        font-size: var(--text-xl);
+        margin: 0 0 var(--space-1);
+    }
+
+    .hero-role {
+        font-weight: 700;
+        font-size: var(--text-md);
+        margin: 0 0 var(--space-1);
+    }
+
+    .hero-location {
+        font-size: var(--text-sm);
+        color: var(--term-muted);
+        margin: 0;
+    }
+
+    .hero-summary {
+        font-size: var(--text-sm);
+        color: var(--color-ink);
+        margin: 0;
+    }
+
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        color: var(--color-ink);
+        background: var(--color-accent);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        padding: var(--space-3) var(--space-4);
+        box-shadow: var(--shadow-offset-sm) var(--shadow-offset-sm) 0 var(--color-ink);
+        transition: translate var(--speed), box-shadow var(--speed);
+        white-space: nowrap;
+    }
+
+    @media (hover: hover) {
+        .download-btn:hover {
+            translate: calc(var(--lift) * -1) calc(var(--lift) * -1);
+            box-shadow:
+                calc(var(--shadow-offset-sm) + var(--lift))
+                calc(var(--shadow-offset-sm) + var(--lift))
+                0 var(--color-ink);
+        }
+    }
+
+    .download-btn:focus-visible {
+        outline: var(--border-width) solid var(--color-ink);
+        outline-offset: var(--space-2);
+    }
+
+    .section-title {
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        margin: 0 0 var(--space-4);
+    }
+
+    .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--space-5) + var(--space-3));
+        padding-top: var(--space-4);
+    }
+
+    .entry-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-2);
+        margin-bottom: var(--space-2);
+    }
+
+    .entry-role {
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        margin: 0 0 var(--space-1);
+    }
+
+    .entry-org {
+        font-size: var(--text-sm);
+        font-weight: 700;
+        color: var(--term-muted);
+        margin: 0;
+    }
+
+    .entry-subtitle {
+        font-size: var(--text-sm);
+        color: var(--term-muted);
+        margin: 0 0 var(--space-3);
+    }
+
+    .gpa-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: var(--color-accent);
+        border: 1px solid var(--color-ink);
+        border-radius: 0.25rem;
+        padding: 0.15rem var(--space-2);
+    }
+
+    .bullet-list {
+        margin: 0;
+        padding-left: var(--space-5);
+        font-size: var(--text-sm);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .skills-box {
+        background: var(--color-bg);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .skill-row {
+        display: grid;
+        grid-template-columns: 10rem 1fr;
+        align-items: baseline;
+        gap: var(--space-2) var(--space-4);
+    }
+
+    @media (width < 36rem) {
+        .skill-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .skill-group {
+        font-size: var(--text-sm);
+        font-weight: 700;
+    }
+
+    .skill-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    .skill-pill {
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: var(--color-surface);
+        border: 1px solid var(--color-ink);
+        border-radius: 0.25rem;
+        padding: 0.15rem var(--space-2);
+    }
+
+    .certs-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .cert-card {
+        background: var(--color-bg);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        padding: var(--space-4);
+        box-shadow: var(--shadow-offset-sm) var(--shadow-offset-sm) 0 var(--color-ink);
+    }
+
+    .cert-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-2);
+        margin-bottom: var(--space-1);
+    }
+
+    .cert-title {
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        margin: 0;
+    }
+
+    .cert-meta {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--term-muted);
+    }
+
+    .cert-desc {
+        font-size: var(--text-sm);
+        margin: 0;
+        color: var(--color-ink);
+    }
+</style>

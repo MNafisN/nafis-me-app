@@ -1,10 +1,15 @@
 ---
 import { Font } from "astro:assets";
+import { getProfile } from "../data/profile.js";
 
 import "../styles/tokens.css";
 import "../styles/global.css";
 
-const { title = "NafisApp", lang = "id" } = Astro.props;
+const { lang = "id", title, description } = Astro.props;
+const { meta } = getProfile(lang);
+const pageTitle = title ?? meta.title;
+const pageDesc = description ?? meta.description;
+const ogLocale = lang === "en" ? "en_US" : "id_ID";
 ---
 
 <html lang={lang}>
@@ -14,7 +19,15 @@ const { title = "NafisApp", lang = "id" } = Astro.props;
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
+		<title>{pageTitle}</title>
+		<meta name="description" content={pageDesc} />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={pageDesc} />
+		<meta property="og:locale" content={ogLocale} />
+		<link rel="alternate" hreflang="id" href="/" />
+		<link rel="alternate" hreflang="en" href="/en/" />
+		<link rel="alternate" hreflang="x-default" href="/" />
 		<!-- Restore the maximized terminal before the first paint, so the page doesn't jump -->
 		<script is:inline>
 			try {
@@ -30,4 +43,3 @@ const { title = "NafisApp", lang = "id" } = Astro.props;
 		<slot />
 	</body>
 </html>
-

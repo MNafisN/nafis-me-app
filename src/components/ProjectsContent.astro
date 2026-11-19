@@ -1,0 +1,231 @@
+---
+import { getProfile } from "../data/profile.js";
+import Card from "./Card.astro";
+import Tag from "./Tag.astro";
+
+const { lang = "id" } = Astro.props;
+const { projectsPage, projects } = getProfile(lang);
+const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p]));
+---
+
+<div class="projects-page">
+    <header class="hero">
+        <div class="hero-tag">
+            <Tag variant="primary">{projectsPage.badge}</Tag>
+        </div>
+        <h2 class="hero-title">{projectsPage.title}</h2>
+        <p class="hero-intro">{projectsPage.intro}</p>
+    </header>
+
+    {
+        projectsPage.groups.map((group) => (
+            <section class="group">
+                <div class="group-head">
+                    <h3 class="group-title">{group.title}</h3>
+                    <p class="group-subtitle">{group.subtitle}</p>
+                </div>
+                <div class="cards">
+                    {
+                        group.items.map((slug, index) => {
+                            const project = bySlug[slug];
+                            if (!project) return null;
+                            const paragraphs = project.details ? project.details.split("\n") : [project.desc];
+                            return (
+                                <Card
+                                    tag={project.tag}
+                                    tagVariant={index % 2 === 0 ? "primary" : "secondary"}
+                                >
+                                    <div class="project-top">
+                                        <h4 class="project-title">{project.title}</h4>
+                                        <code class="project-slug">/{project.slug}</code>
+                                    </div>
+                                    <p class="project-summary">{project.desc}</p>
+                                    {
+                                        paragraphs.map((line) => (
+                                            <p class="project-detail">{line}</p>
+                                        ))
+                                    }
+                                    {
+                                        project.stack && (
+                                            <ul class="stack-list" role="list">
+                                                {project.stack.map((tech) => (
+                                                    <li class="stack-pill">{tech}</li>
+                                                ))}
+                                            </ul>
+                                        )
+                                    }
+                                </Card>
+                            );
+                        })
+                    }
+                </div>
+            </section>
+        ))
+    }
+
+    <section class="highlights" aria-labelledby="projects-highlights-title">
+        <h3 id="projects-highlights-title" class="highlights-title">{projectsPage.highlightsTitle}</h3>
+        <dl class="highlights-grid">
+            {
+                projectsPage.highlights.map((item) => (
+                    <div class="highlight-row">
+                        <dt class="highlight-label">{item.label}</dt>
+                        <dd class="highlight-text">{item.text}</dd>
+                    </div>
+                ))
+            }
+        </dl>
+    </section>
+</div>
+
+<style>
+    .projects-page {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+        padding-block: var(--space-3) var(--space-5);
+    }
+
+    .hero {
+        background: var(--color-bg);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-ink);
+        padding: var(--space-5);
+    }
+
+    .hero-tag {
+        margin-bottom: var(--space-3);
+    }
+
+    .hero-title {
+        font-family: var(--font-display);
+        font-size: var(--text-xl);
+        margin: 0 0 var(--space-2);
+    }
+
+    .hero-intro {
+        color: var(--term-muted);
+        font-size: var(--text-sm);
+        margin: 0;
+    }
+
+    .group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .group-title {
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        margin: 0 0 var(--space-1);
+    }
+
+    .group-subtitle {
+        color: var(--term-muted);
+        font-size: var(--text-sm);
+        margin: 0;
+    }
+
+    .cards {
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--space-5) + var(--space-3));
+        padding-top: var(--space-4);
+    }
+
+    .project-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-2);
+        margin-bottom: var(--space-2);
+    }
+
+    .project-title {
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        margin: 0;
+    }
+
+    .project-slug {
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        color: var(--term-muted);
+    }
+
+    .project-summary {
+        font-weight: 700;
+        font-size: var(--text-sm);
+        margin: 0 0 var(--space-2);
+    }
+
+    .project-detail {
+        font-size: var(--text-sm);
+        color: var(--color-ink);
+        margin: 0 0 var(--space-2);
+    }
+
+    .stack-list {
+        list-style: none;
+        padding: 0;
+        margin: var(--space-3) 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    .stack-pill {
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: var(--color-bg);
+        border: 1px solid var(--color-ink);
+        border-radius: 0.25rem;
+        padding: 0.15rem var(--space-2);
+    }
+
+    .highlights {
+        background: var(--color-bg);
+        border: var(--border-width) solid var(--color-ink);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+    }
+
+    .highlights-title {
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        margin: 0 0 var(--space-4);
+    }
+
+    .highlights-grid {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        margin: 0;
+    }
+
+    .highlight-row {
+        display: grid;
+        grid-template-columns: 11rem 1fr;
+        gap: var(--space-2) var(--space-4);
+        font-size: var(--text-sm);
+    }
+
+    @media (width < 36rem) {
+        .highlight-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .highlight-label {
+        font-weight: 700;
+        color: var(--color-ink);
+    }
+
+    .highlight-text {
+        margin: 0;
+        color: var(--color-ink);
+    }
+</style>

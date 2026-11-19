@@ -26,3 +26,5 @@ public/*.pdf
 .idea/
 
 artifacts/
+
+public/files/

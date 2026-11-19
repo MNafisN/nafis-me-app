@@ -207,5 +207,5 @@ import Prompt from "./Prompt.astro";
     });
 
     resize();
-    if (!touch.matches) input.focus({ preventScroll: true });
+    if (!touch.matches && input.offsetParent !== null) input.focus({ preventScroll: true });
 </script>

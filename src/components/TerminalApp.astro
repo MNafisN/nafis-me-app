@@ -1,11 +1,13 @@
 ---
 // Terminal app organism: tabs, panels, input and bottom bar, plus the script that runs them
 import CommandMenu from "./CommandMenu.astro";
+import CvContent from "./CvContent.astro";
 import HomeContent from "./HomeContent.astro";
 import InputBar from "./InputBar.astro";
 import LanguageToggle from "./LanguageToggle.astro";
 import MaximizeToggle from "./MaximizeToggle.astro";
 import MessageTemplates from "./MessageTemplates.astro";
+import ProjectsContent from "./ProjectsContent.astro";
 import ShortcutsHint from "./ShortcutsHint.astro";
 import Tab from "./Tab.astro";
 import TabBar from "./TabBar.astro";
@@ -18,21 +20,21 @@ const { lang = "id" } = Astro.props;
 
 <Terminal>
     <TabBar slot="tabs">
-        <Tab id="tab-home" controls="panel-home">Home</Tab>
+        <Tab active id="tab-home" controls="panel-home">Home</Tab>
         <Tab id="tab-projects" controls="panel-projects">Projects</Tab>
         <Tab id="tab-cv" controls="panel-cv">CV</Tab>
-        <Tab active id="tab-1" controls="panel-1">Terminal</Tab>
+        <Tab id="tab-1" controls="panel-1">Terminal</Tab>
     </TabBar>
-    <TerminalPanel id="panel-home" labelledby="tab-home" hidden page>
+    <TerminalPanel id="panel-home" labelledby="tab-home" page>
         <HomeContent lang={lang} />
     </TerminalPanel>
     <TerminalPanel id="panel-projects" labelledby="tab-projects" hidden page>
-        <p>Coming soon.</p>
+        <ProjectsContent lang={lang} />
     </TerminalPanel>
     <TerminalPanel id="panel-cv" labelledby="tab-cv" hidden page>
-        <p>Coming soon.</p>
+        <CvContent lang={lang} />
     </TerminalPanel>
-    <TerminalPanel id="panel-1" labelledby="tab-1">
+    <TerminalPanel id="panel-1" labelledby="tab-1" hidden>
         <TerminalSession lang={lang} />
     </TerminalPanel>
     <div slot="input">
