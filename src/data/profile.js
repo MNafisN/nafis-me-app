@@ -18,7 +18,8 @@ export const profiles = {
             unknownCommandError: (cmd) => `Perintah tidak dikenal: /${cmd}. Ketik /help untuk melihat daftar perintah.`,
             missingProjectError: (slugs) => `Nama proyek belum diisi. Gunakan: /project <nama>. Pilihan: ${slugs}. Ketik /projects untuk melihat semuanya, atau /help untuk daftar perintah.`,
             unknownProjectError: (slug, slugs) => `Proyek tidak ditemukan: ${slug}. Pilihan: ${slugs}. Ketik /projects untuk melihat semuanya, atau /help untuk daftar perintah.`,
-            agentDemoReply: "AI agent belum terhubung (mode demo), jadi belum bisa menjawab pesan ini.\nCoba ketik /help untuk melihat perintah yang tersedia.",
+            agentFallbackReply: "AI agent Nafis sedang sibuk atau belum terjangkau saat ini.\nSambil menunggu, kamu tetap bisa menjelajahi portofolio lewat perintah /projects, /cv, /contact, atau /help.",
+            agentRateLimitReply: "Batas pesan sementara telah tercapai agar server tetap responsif.\nSilakan tunggu sebentar, atau gunakan perintah /projects, /cv, dan /contact.",
             commandDescriptions: {
                 help: "Tampilkan daftar perintah",
                 projects: "Tampilkan daftar proyek",
@@ -285,7 +286,8 @@ export const profiles = {
             unknownCommandError: (cmd) => `Unknown command: /${cmd}. Type /help to see the commands.`,
             missingProjectError: (slugs) => `Missing project name. Usage: /project <name>. Names: ${slugs}. Type /projects to see them all, or /help for the commands.`,
             unknownProjectError: (slug, slugs) => `Unknown project: ${slug}. Names: ${slugs}. Type /projects to see them all, or /help for the commands.`,
-            agentDemoReply: "The AI agent is not connected yet (demo mode), so I can't answer that for now.\nTry /help to see what you can do here.",
+            agentFallbackReply: "Nafis's AI agent is currently busy or unreachable.\nIn the meantime, you can explore the portfolio using /projects, /cv, /contact, or /help.",
+            agentRateLimitReply: "Temporary message limit reached to keep the server responsive.\nPlease wait a moment, or explore via /projects, /cv, and /contact.",
             commandDescriptions: {
                 help: "List the commands",
                 projects: "List the projects",

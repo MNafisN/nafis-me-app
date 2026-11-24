@@ -165,6 +165,11 @@ const { lang = "id" } = Astro.props;
 
     const MAX_TERMINALS = 6;
     let lastTerminalTab = document.getElementById("tab-1");
+    // Per-tab busy tracking and ephemeral conversation history (vanishes when a tab is closed or cleared)
+    const busyTabs = new Set();
+    const tabHistories = new WeakMap();
+    // The fill chip (/project …) stays usable: filling the input is fine while a reply is pending
+    const commandChips = document.querySelectorAll(".quick[data-command]");
 
     function panelOf(tab) {
         return document.getElementById(tab.getAttribute("aria-controls"));
@@ -172,6 +177,32 @@ const { lang = "id" } = Astro.props;
 
     function isTerminal(tab) {
         return Boolean(panelOf(tab)?.querySelector("[data-log]"));
+    }
+
+    function historyOf(tab) {
+        let history = tabHistories.get(tab);
+        if (!history) {
+            history = [];
+            tabHistories.set(tab, history);
+        }
+        return history;
+    }
+
+    function syncBusyUI() {
+        const active = tablist.querySelector('[aria-selected="true"]');
+        const target = isTerminal(active) ? active : lastTerminalTab;
+        const busy = Boolean(target && busyTabs.has(target));
+        for (const chip of commandChips) {
+            if (busy) chip.setAttribute("aria-disabled", "true");
+            else chip.removeAttribute("aria-disabled");
+        }
+        document.dispatchEvent(new CustomEvent("terminal:busy", { detail: { busy } }));
+    }
+
+    function setTabBusy(tab, value) {
+        if (value) busyTabs.add(tab);
+        else busyTabs.delete(tab);
+        syncBusyUI();
     }
 
     function activate(tab) {
@@ -187,6 +218,7 @@ const { lang = "id" } = Astro.props;
         // "page" hides the input, the quick actions and the shortcuts button (see the CSS)
         terminal.dataset.view = isTerminal(tab) ? "terminal" : "page";
         tab.scrollIntoView({ block: "nearest", inline: "nearest" });
+        syncBusyUI();
     }
 
     function setLabel(tab, name) {
@@ -227,6 +259,8 @@ const { lang = "id" } = Astro.props;
         const index = tabs.indexOf(tab);
         const wasSelected = tab.getAttribute("aria-selected") === "true";
 
+        busyTabs.delete(tab);
+        tabHistories.delete(tab);
         document.getElementById(tab.getAttribute("aria-controls")).remove();
         tab.parentElement.remove();
 
@@ -366,19 +400,6 @@ const { lang = "id" } = Astro.props;
 
     // Messages: a /command runs in the browser, anything else goes to the agent.
     // Sending from Home, Projects or CV switches to the last-used Terminal tab first.
-    let busy = false;
-    // The fill chip (/project …) stays usable: filling the input is fine while a reply is pending
-    const commandChips = document.querySelectorAll(".quick[data-command]");
-
-    function setBusy(value) {
-        busy = value;
-        for (const chip of commandChips) {
-            if (busy) chip.setAttribute("aria-disabled", "true");
-            else chip.removeAttribute("aria-disabled");
-        }
-        document.dispatchEvent(new CustomEvent("terminal:busy", { detail: { busy } }));
-    }
-
     function scrollToBottom(panel) {
         panel.scrollTop = panel.scrollHeight;
     }
@@ -390,30 +411,38 @@ const { lang = "id" } = Astro.props;
     }
 
     async function send(text) {
-        if (busy || !text.trim()) return;
+        if (!text.trim()) return;
 
         let tab = tablist.querySelector('[aria-selected="true"]');
         if (!isTerminal(tab)) {
             tab = lastTerminalTab?.isConnected ? lastTerminalTab : document.getElementById("tab-1");
             activate(tab);
         }
+        if (busyTabs.has(tab)) return;
+
         const panel = panelOf(tab);
         const log = panel.querySelector("[data-log]");
 
         log.append(renderCommand(text));
         scrollToBottom(panel);
-        setBusy(true);
+        setTabBusy(tab, true);
 
         let blocks;
         try {
             if (isCommand(text)) {
-                blocks = await runCommand(text, { clear: () => log.replaceChildren(), maximize });
+                blocks = await runCommand(text, {
+                    clear: () => {
+                        log.replaceChildren();
+                        tabHistories.delete(tab);
+                    },
+                    maximize,
+                });
             } else {
                 const pending = renderPending();
                 log.append(pending);
                 scrollToBottom(panel);
                 try {
-                    blocks = await askAgent(text);
+                    blocks = await askAgent(text, historyOf(tab));
                 } finally {
                     pending.remove();
                 }
@@ -423,10 +452,12 @@ const { lang = "id" } = Astro.props;
         }
 
         try {
-            log.append(renderBlocks(blocks));
+            if (panel.isConnected) {
+                log.append(renderBlocks(blocks));
+            }
         } finally {
-            scrollToBottom(panel);
-            setBusy(false);
+            if (panel.isConnected) scrollToBottom(panel);
+            setTabBusy(tab, false);
         }
     }
 

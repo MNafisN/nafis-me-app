@@ -1,5 +1,10 @@
-// Slash commands and the fake AI agent (no DOM manipulation; reads documentElement.lang for locale)
+// Slash commands and the Hermes AI agent client (no DOM manipulation; reads documentElement.lang for locale)
 import { getProfile } from "../data/profile.js";
+
+const AGENT_API_URL = import.meta.env.PUBLIC_AGENT_API_URL || "http://43.173.22.252:8080/api/chat";
+const AGENT_MODEL = "hermes-agent";
+const MAX_HISTORY_MESSAGES = 6;
+const AGENT_TIMEOUT_MS = 25000;
 
 const BASE_COMMANDS = [
     { name: "help", args: "" },
@@ -130,14 +135,51 @@ export async function runCommand(text, ctx) {
     }
 }
 
-export async function askAgent() {
+export async function askAgent(input, history = []) {
     const { ui } = currentProfile();
-    const delay = 600 + Math.random() * 300;
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    return [{
-        type: "text",
-        text: ui.agentDemoReply,
-    }];
+    const isArrayInput = Array.isArray(input);
+    const userText = isArrayInput ? "" : String(input).trim();
+    const messages = isArrayInput
+        ? input.slice(-MAX_HISTORY_MESSAGES)
+        : [...history.slice(-(MAX_HISTORY_MESSAGES - 1)), { role: "user", content: userText }];
+
+    try {
+        const response = await fetch(AGENT_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: AGENT_MODEL,
+                messages,
+                stream: false,
+            }),
+            signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),
+        });
+
+        if (response.status === 429) {
+            return [{ type: "text", text: ui.agentRateLimitReply }];
+        }
+
+        if (!response.ok) {
+            return [{ type: "text", text: ui.agentFallbackReply }];
+        }
+
+        const data = await response.json();
+        const reply = data?.choices?.[0]?.message?.content?.trim();
+        if (data?.hermes?.failed || !reply) {
+            return [{ type: "text", text: ui.agentFallbackReply }];
+        }
+
+        if (!isArrayInput && Array.isArray(history)) {
+            history.push({ role: "user", content: userText }, { role: "assistant", content: reply });
+            if (history.length > MAX_HISTORY_MESSAGES) {
+                history.splice(0, history.length - MAX_HISTORY_MESSAGES);
+            }
+        }
+
+        return [{ type: "text", text: reply }];
+    } catch {
+        return [{ type: "text", text: ui.agentFallbackReply }];
+    }
 }
 
 export function suggest(value) {
